@@ -10,7 +10,7 @@ all: convert2tei udpipe nametag convert2teitok
 
 convert2tei: clean
 	mkdir -p $(TEI)
-	perl convert/iRozhlas2tei.pl --out-dir "$(TEI)" --debug $(IN)/
+	perl convert/iRozhlas2tei.pl --out-dir "$(TEI)" --debug $(IN)/all-0.json
 	find "$(TEI)" -type f -name "doc*.xml" -printf '%P\n' > $(FL)
 
 create_corpus:

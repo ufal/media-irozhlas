@@ -11,7 +11,7 @@ all: convert2tei udpipe nametag convert2teitok
 convert2tei: clean
 	mkdir -p $(TEI)
 	perl convert/iRozhlas2tei.pl --out-dir "$(TEI)" --debug $(IN)/all-0.json
-	find "$(TEI)" -type f -name "doc*.xml" -printf '%P\n' > $(FL)
+	#find "$(TEI)" -type f -name "doc*.xml" -printf '%P\n' > $(FL)
 
 create_corpus:
 	echo '<?xml version="1.0" encoding="utf-8"?>' > $(TEI)/corpus.xml
@@ -19,6 +19,20 @@ create_corpus:
 	cat $(FL) | sed 's@^@cat $(TEI)/@;s@$$@|sed "/^<\?xml /d"@' | sh >> $(TEI)/corpus.xml
 	echo '</teiCorpus>' >> $(TEI)/corpus.xml
 	echo 'corpus.xml' > $(FL)
+
+
+create_corpus_splitted: ${TEI}/doc*.xml
+	rm -f $(FL)
+	c=0 ; \
+	i=0 ;	\
+	for file in $^ ; \
+	do \
+	  test $$i -eq 0 &&  echo -n "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n<teiCorpus>\n" > $(TEI)/corpus-$$c.xml && echo corpus-$$c.xml >> $(FL) ; \
+	  sed '1d' $${file} >> $(TEI)/corpus-$$c.xml ; \
+	  : $$((i=i+1)) ; \
+	  test $$i -ge 50 && echo '</teiCorpus>' >> "$(TEI)/corpus-$$c.xml" && : $$((c=c+1)) && : $$((i=0)) ; \
+	done ; \
+	test $$i -gt 0 && echo '</teiCorpus>' >> $(TEI)/corpus-$$c.xml || echo
 
 udpipe: lib udpipe2
 	mkdir -p $(UDPIPE)
@@ -39,7 +53,7 @@ nametag: lib nametag2
 
 convert2teitok:
 	mkdir -p $(TEITOK)
-	for FILE in $(shell cat $(FL) ) ; do perl convert/tei2teitok.pl --in "$(NAMETAG)/$${FILE}" --out "$(TEITOK)/$${FILE}"; done
+	for FILE in $(shell cat $(FL) ) ; do echo "converting: $${FILE}" ; perl convert/tei2teitok.pl --in "$(NAMETAG)/$${FILE}" --out "$(TEITOK)/$${FILE}"; done
 
 
 

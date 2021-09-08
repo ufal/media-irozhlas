@@ -10,6 +10,7 @@ GetOptions (
             'verbose' => \$verbose,
             'in=s' => \$filename,
             'out=s' => \$outfile,
+            'split-corpus' => \$split_corpus,
         );
 
 if ( !$filename ) { $filename = shift; };
@@ -77,9 +78,22 @@ foreach $node ( $xml->findnodes("//linkGrp[\@type=\"UD-SYN\"]/link") ) {
 	};
 };
 
-open FILE, ">$outfile";
-# binmode(FILE, ":utf8");
-print FILE $xml->toString;
-close FILE;
-
-print "Saved to $outfile";
+if ( $split_corpus ) {
+  foreach $tei ($xml->findnodes("//TEI[\@id]")) {
+  	my $dom = XML::LibXML::Document->new("1.0", "utf-8");
+  	$tei->unbindNode();
+  	$dom->setDocumentElement($tei);
+  	my $name = $tei->getAttribute('id').".xml";
+  	open FILE, ">$outfile/$name";
+    # binmode(FILE, ":utf8");
+    print FILE $dom->toString;
+    close FILE;
+    print "Saved to $outfile/$name";
+  }
+} else {
+  open FILE, ">$outfile";
+  # binmode(FILE, ":utf8");
+  print FILE $xml->toString;
+  close FILE;
+  print "Saved to $outfile";
+}

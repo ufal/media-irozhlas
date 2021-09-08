@@ -6,7 +6,7 @@ NAMETAG := ${OUT}/nametag
 TEITOK := ${OUT}/teitok
 FL := ${OUT}/tei.fl
 
-all: convert2tei udpipe nametag convert2teitok
+all: convert2tei create_corpus_splitted udpipe nametag convert2teitok
 
 convert2tei: clean
 	mkdir -p $(TEI)
@@ -53,7 +53,7 @@ nametag: lib nametag2
 
 convert2teitok:
 	mkdir -p $(TEITOK)
-	for FILE in $(shell cat $(FL) ) ; do echo "converting: $${FILE}" ; perl convert/tei2teitok.pl --in "$(NAMETAG)/$${FILE}" --out "$(TEITOK)/$${FILE}"; done
+	for FILE in $(shell cat $(FL) ) ; do echo "converting: $${FILE}" ; perl convert/tei2teitok.pl --split-corpus --in "$(NAMETAG)/$${FILE}" --out "$(TEITOK)"; done
 
 
 

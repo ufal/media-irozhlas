@@ -32,8 +32,14 @@
                 <xsl:attribute name="when"><xsl:value-of select="translate(./changed/text(),' ','T')"/></xsl:attribute>
                 <xsl:value-of select="./changed" />
               </date>
-              <xsl:apply-templates select="./sections/ITEM" />
-              <xsl:apply-templates select="./tags/ITEM" />
+              <note type="section">
+                <xsl:text>|</xsl:text>
+                <xsl:apply-templates select="./sections/ITEM" />
+              </note>
+              <note type="tag">
+                <xsl:text>|</xsl:text>
+                <xsl:apply-templates select="./tags/ITEM" />
+              </note>
             </bibl>
           </sourceDesc>
         </fileDesc>
@@ -46,7 +52,7 @@
   </xsl:template>
   <xsl:template match="ITEM[./parent::authors]">
     <xsl:element name="author">
-      <xsl:attribute name="sameAs">pers-<xsl:value-of select="./id"/></xsl:attribute>
+      <xsl:attribute name="sameAs">#pers-<xsl:value-of select="./id"/></xsl:attribute>
       <xsl:element name="persName"><xsl:value-of select="./name" /></xsl:element>
     </xsl:element>
   </xsl:template>
@@ -59,19 +65,19 @@
   </xsl:template>
 
   <xsl:template match="ITEM[./parent::sections]">
-    <xsl:element name="idno">
-      <xsl:attribute name="type">section</xsl:attribute>
-      <xsl:attribute name="sameAs">sect-<xsl:value-of select="./tid"/></xsl:attribute>
+    <xsl:element name="tag">
+      <xsl:attribute name="sameAs">#sect-<xsl:value-of select="./tid"/></xsl:attribute>
       <xsl:value-of select="./name" />
     </xsl:element>
+    <xsl:text>|</xsl:text>
   </xsl:template>
 
   <xsl:template match="ITEM[./parent::tags]">
-    <xsl:element name="idno">
-      <xsl:attribute name="type">tag</xsl:attribute>
-      <xsl:attribute name="sameAs">tag-<xsl:value-of select="./tid"/></xsl:attribute>
+    <xsl:element name="tag">
+      <xsl:attribute name="sameAs">#tag-<xsl:value-of select="./tid"/></xsl:attribute>
       <xsl:value-of select="./name" />
     </xsl:element>
+    <xsl:text>|</xsl:text>
   </xsl:template>
 
   <xsl:template match="perex">

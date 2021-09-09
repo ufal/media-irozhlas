@@ -127,12 +127,21 @@
     <xsl:text> </xsl:text>
   </xsl:template>
 
-  <xsl:template match="span|strong" mode="paragraph">
+  <xsl:template match="span" mode="paragraph">
     <xsl:apply-templates select="*|text()" mode="paragraph" />
   </xsl:template>
 
+  <xsl:template match="strong" mode="paragraph">
+    <xsl:message>STRONG </xsl:message>
+    <xsl:element name="hi">
+      <xsl:attribute name="rend">bold</xsl:attribute>
+      <xsl:apply-templates select="*|text()" mode="paragraph" />
+    </xsl:element>
+  </xsl:template>
+
   <xsl:template match="br" mode="paragraph">
-    <xsl:text> </xsl:text>
+    <xsl:message>BR </xsl:message>
+    <xsl:element name="lb"/><xsl:text> </xsl:text>
   </xsl:template>
 
   <xsl:template match="*[contains(@class,'inline')]" mode="html">

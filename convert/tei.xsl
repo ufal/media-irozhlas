@@ -101,7 +101,7 @@
     </xsl:element>
   </xsl:template>
 
-  <xsl:template match="p[.//text()[normalize-space(string-length()) > 0 ] ]" mode="html">
+  <xsl:template match="p[.//text()[string-length(normalize-space()) > 0 ] ]" mode="html">
     <xsl:element name="seg">
       <xsl:apply-templates select="./*|./text()" mode="paragraph" />
     </xsl:element>
@@ -127,21 +127,59 @@
     <xsl:text> </xsl:text>
   </xsl:template>
 
-  <xsl:template match="span" mode="paragraph">
+  <xsl:template match="span[.//text()[string-length(normalize-space()) > 0 ] ]" mode="paragraph">
     <xsl:apply-templates select="*|text()" mode="paragraph" />
   </xsl:template>
 
-  <xsl:template match="strong" mode="paragraph">
-    <xsl:message>STRONG </xsl:message>
+  <xsl:template match="strong[.//text()[string-length(normalize-space()) > 0 ] ]" mode="paragraph">
+    <xsl:text> </xsl:text>
     <xsl:element name="hi">
       <xsl:attribute name="rend">bold</xsl:attribute>
       <xsl:apply-templates select="*|text()" mode="paragraph" />
     </xsl:element>
+    <xsl:text> </xsl:text>
   </xsl:template>
 
   <xsl:template match="br" mode="paragraph">
-    <xsl:message>BR </xsl:message>
-    <xsl:element name="lb"/><xsl:text> </xsl:text>
+    <xsl:choose>
+      <xsl:when test="string-length(normalize-space(concat('','',./following-sibling::text()))) = 0">
+        <xsl:message>removing newline at the end element <xsl:value-of select="./ancestor::p[1]/@xml:id" /></xsl:message>
+        <!--<xsl:comment>REMOVING-BR</xsl:comment>-->
+        <xsl:text> </xsl:text>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:element name="lb"/><xsl:text> </xsl:text>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+
+  <xsl:template match="table" mode="html">
+    <xsl:message>TABLE </xsl:message>
+    <xsl:element name="table">
+      <xsl:apply-templates select="./caption" mode="paragraph" />
+      <xsl:apply-templates select=".//tr" mode="html" />
+    </xsl:element>
+  </xsl:template>
+
+  <xsl:template match="tr" mode="html">
+    <xsl:message>TABLE row </xsl:message>
+    <xsl:element name="row">
+      <xsl:apply-templates select="./*" mode="paragraph" />
+    </xsl:element>
+  </xsl:template>
+
+  <xsl:template match="caption" mode="paragraph">
+    <xsl:message>TABLE head </xsl:message>
+    <xsl:element name="head">
+      <xsl:apply-templates select=".//text()" mode="paragraph" />
+    </xsl:element>
+  </xsl:template>
+
+  <xsl:template match="td|th" mode="paragraph">
+    <xsl:message>TABLE cell </xsl:message>
+    <xsl:element name="cell">
+      <xsl:apply-templates select=".//text()" mode="paragraph" />
+    </xsl:element>
   </xsl:template>
 
   <xsl:template match="*[contains(@class,'inline')]" mode="html">

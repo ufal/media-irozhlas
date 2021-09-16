@@ -20,7 +20,7 @@ GetOptions ( ## Command line options
             'out-dir=s' => \$outdir
             );
 
-
+my @paragraph_like = qw/seg head cell/;
 my $json_server = iRozhlas::data::from_json_files->new(@ARGV);
 File::Path::mkpath($outdir) unless -d $outdir;
 
@@ -53,7 +53,7 @@ while(my $data = $json_server->next) {
   my $doc = $data_process->convert('tei',$xml);
   my $doc_id = $doc->documentElement()->getAttributeNS('http://www.w3.org/XML/1998/namespace','id');
   my $cnt = 0;
-  for my $node ($doc->findnodes('//*[local-name() = "text"]//*[local-name() = "seg" or local-name() = "head"]')){
+  for my $node ($doc->findnodes('//*[local-name() = "text"]//*[contains(" '.join(' ',@paragraph_like).' " ,concat(" ",local-name()," "))]')){
     $node->setAttributeNS('http://www.w3.org/XML/1998/namespace','id',"$doc_id.p".(++$cnt));
   }
   save_tei($doc);
@@ -72,11 +72,19 @@ sub save_tei {
   binmode FILE;
   $pp->pretty_print($doc);
   my $raw = $doc->toString();
+  clean_spacing(\$raw);
   print FILE $raw;
   close FILE;
 }
 
 
+sub clean_spacing {
+  my $text_ref = shift;
+  local $/;
+  $/ = undef;
+  $$text_ref =~ s/ +((<\/[a-z]*>)+) */$1 /g; # moving ending spaces after element
+  $$text_ref =~ s/ *((<[a-z]+[^>]*>)+) +/ $1/g; # moving begining spaces after element
+}
 
 sub obj2xml {
   my $obj = shift;

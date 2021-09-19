@@ -1,5 +1,6 @@
-IN := data-in
-OUT := data-out
+DATA := $(shell sh -c 'test `hostname` = "parczech" && echo -n "/opt/irozhlas/data/"')
+IN := ${DATA}data-in
+OUT := ${DATA}data-out
 TEI := ${OUT}/tei
 UDPIPE := ${OUT}/udpipe
 NAMETAG := ${OUT}/nametag
@@ -7,6 +8,7 @@ TEITOK := ${OUT}/teitok
 FL := ${OUT}/tei.fl
 
 all: convert2tei create_corpus_splitted udpipe nametag convert2teitok
+
 
 convert2tei: clean
 	mkdir -p $(TEI)
@@ -38,6 +40,8 @@ udpipe: lib udpipe2
 	mkdir -p $(UDPIPE)
 	perl -I lib udpipe2/udpipe2.pl --colon2underscore \
 	                             --model=czech-pdt-ud-2.6-200830 \
+	                             --elements "head,seg,cell" \
+	                             --sub-elements "ref,hi" \
 	                             --filelist $(FL) \
 	                             --input-dir $(TEI) \
 	                             --output-dir $(UDPIPE)
@@ -59,10 +63,14 @@ convert2teitok:
 
 
 #################
+convert2tei-sample: clean
+	mkdir -p $(TEI)
+	perl convert/iRozhlas2tei.pl --out-dir "$(TEI)" --debug small-sample.json
+
 create_corpus_udpipe_test: convert2tei # all-0.json issue https://github.com/ufal/ParCzech/issues/151
 	echo '<?xml version="1.0" encoding="utf-8"?>' > $(TEI)/corpus.xml
 	echo '<teiCorpus>' >> $(TEI)/corpus.xml
-	cat $(TEI)/doc-8511830.xml $(TEI)/doc-8515235.xml |sed '/^<?xml version/d'  >> $(TEI)/corpus.xml
+	cat $(TEI)/doc-8520335.xml |sed '/^<?xml version/d'  >> $(TEI)/corpus.xml
 	echo '</teiCorpus>' >> $(TEI)/corpus.xml
 	echo 'corpus.xml' > $(FL)
 

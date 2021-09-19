@@ -23,11 +23,11 @@ create_corpus:
 	echo 'corpus.xml' > $(FL)
 
 
-create_corpus_splitted: ${TEI}/doc*.xml
+create_corpus_splitted:
 	rm -f $(FL)
 	c=0 ; \
 	i=0 ;	\
-	for file in $^ ; \
+	for file in `find ${TEI} -name "doc-*"` ; \
 	do \
 	  test $$i -eq 0 &&  echo -n "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n<teiCorpus>\n" > $(TEI)/corpus-$$c.xml && echo corpus-$$c.xml >> $(FL) ; \
 	  sed '1d' $${file} >> $(TEI)/corpus-$$c.xml ; \

@@ -12,8 +12,12 @@ all: convert2tei create_corpus_splitted udpipe nametag convert2teitok
 
 convert2tei: clean
 	mkdir -p $(TEI)
-	perl convert/iRozhlas2tei.pl --out-dir "$(TEI)" --debug $(IN)/all-0.json
+	perl convert/iRozhlas2tei.pl --out-dir "$(TEI)" --debug $(IN)/all-*.json
 	#find "$(TEI)" -type f -name "doc*.xml" -printf '%P\n' > $(FL)
+
+convert2tei_sample: clean
+	mkdir -p $(TEI)
+	perl convert/iRozhlas2tei.pl --out-dir "$(TEI)" --debug $(IN)/all-62.json
 
 create_corpus:
 	echo '<?xml version="1.0" encoding="utf-8"?>' > $(TEI)/corpus.xml
@@ -41,6 +45,7 @@ udpipe: lib udpipe2
 	perl -I lib udpipe2/udpipe2.pl --colon2underscore \
 	                             --model=czech-pdt-ud-2.6-200830 \
 	                             --elements "head,seg,cell" \
+	                             --debug \
 	                             --sub-elements "ref,hi" \
 	                             --filelist $(FL) \
 	                             --input-dir $(TEI) \
@@ -67,10 +72,10 @@ convert2tei-sample: clean
 	mkdir -p $(TEI)
 	perl convert/iRozhlas2tei.pl --out-dir "$(TEI)" --debug small-sample.json
 
-create_corpus_udpipe_test: convert2tei # all-0.json issue https://github.com/ufal/ParCzech/issues/151
+create_corpus_udpipe_test:  # all-0.json issue https://github.com/ufal/ParCzech/issues/151
 	echo '<?xml version="1.0" encoding="utf-8"?>' > $(TEI)/corpus.xml
 	echo '<teiCorpus>' >> $(TEI)/corpus.xml
-	cat $(TEI)/doc-8520335.xml |sed '/^<?xml version/d'  >> $(TEI)/corpus.xml
+	cat $(TEI)/doc-7408091.xml |sed '/^<?xml version/d'  >> $(TEI)/corpus.xml
 	echo '</teiCorpus>' >> $(TEI)/corpus.xml
 	echo 'corpus.xml' > $(FL)
 

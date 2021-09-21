@@ -84,7 +84,7 @@ sub clean_spacing {
   $/ = undef;
   $$text_ref =~ s/ +((<\/[a-z]*>)+) */$1 /g; # moving ending spaces after element
   $$text_ref =~ s/ *((<[a-z]+[^>\/]*>)+) +/ $1/g; # moving begining spaces before element
-  $$text_ref =~ s/(:?<lb\/>| )+((<\/[a-z]*>)+) */$1<lb\/> /g; # moving ending newlines after element
+  $$text_ref =~ s/(?:<lb\/>| )+((<\/[a-z]*>)+) */$1<lb\/> /g; # moving ending newlines after element
   $$text_ref =~ s/ *((<[a-z]+[^>\/]*>)+)(:?<lb\/>| )+/<lb\/> $1/g; # moving begining newlines before element
 
 }

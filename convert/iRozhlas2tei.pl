@@ -8,7 +8,7 @@ use XML::LibXML qw(:libxml);
 use JSON;
 use XML::LibXML::PrettyPrint;
 use File::Path;
-
+use Encode;
 use Getopt::Long;
 
 
@@ -69,11 +69,13 @@ sub save_tei {
   my $path = "$outdir/$filename.xml";
   open FILE, ">$path";
   print STDERR "saving to: $path\n";
-  binmode FILE;
+ # binmode FILE;
   $pp->pretty_print($doc);
   my $raw = $doc->toString();
-  clean_spacing(\$raw);
-  print FILE $raw;
+  my $text = Encode::decode("utf-8", $raw);
+  clean_spacing(\$text);
+  clean_awful_characters(\$text);
+  print FILE $text;
   close FILE;
 }
 
@@ -86,7 +88,16 @@ sub clean_spacing {
   $$text_ref =~ s/ *((<[a-z]+[^>\/]*>)+) +/ $1/g; # moving begining spaces before element
   $$text_ref =~ s/(?:<lb\/>| )+((<\/[a-z]*>)+) */$1<lb\/> /g; # moving ending newlines after element
   $$text_ref =~ s/ *((<[a-z]+[^>\/]*>)+)(:?<lb\/>| )+/<lb\/> $1/g; # moving begining newlines before element
+}
 
+
+sub clean_awful_characters {
+  my $text_ref = shift;
+  local $/;
+  $/ = undef;
+  $$text_ref =~ tr/\x{200B}\x{00AD}//d;
+  $$text_ref =~ tr/\x{202F}\x{00A0}/  /;
+  $$text_ref =~ tr/[\x{2000}-\x{FFFF}]//d;
 }
 
 sub obj2xml {

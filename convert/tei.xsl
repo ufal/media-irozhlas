@@ -107,9 +107,10 @@
     </xsl:element>
   </xsl:template>
 
-  <xsl:template match="h2" mode="html">
+  <xsl:template match="h1|h2|h3|h4" mode="html">
     <xsl:element name="head">
       <xsl:attribute name="type">subtitle</xsl:attribute>
+      <xsl:attribute name="subtype"><xsl:value-of select="local-name()"/></xsl:attribute>
       <xsl:apply-templates select=".//text()" mode="paragraph" />
     </xsl:element>
   </xsl:template>

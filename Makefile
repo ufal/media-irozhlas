@@ -2,12 +2,13 @@ DATA := $(shell sh -c 'test `hostname` = "parczech" && echo -n "/opt/irozhlas/da
 IN := ${DATA}data-in
 OUT := ${DATA}data-out
 TEI := ${OUT}/tei
+TEIANA := ${OUT}/tei-ana
 UDPIPE := ${OUT}/udpipe
 NAMETAG := ${OUT}/nametag
 TEITOK := ${OUT}/teitok
 FL := ${OUT}/tei.fl
 
-all: convert2tei create_corpus_splitted udpipe nametag convert2teitok
+all: convert2tei create_corpus_splitted udpipe nametag split_corpus convert2teitok
 
 
 convert2tei: clean
@@ -59,6 +60,10 @@ nametag: lib nametag2
                                  --filelist $(FL) \
                                  --input-dir $(UDPIPE) \
                                  --output-dir $(NAMETAG)
+
+split_corpus:
+	mkdir -p $(TEIANA)
+	for FILE in $(shell cat $(FL) ) ; do echo "splitting: $${FILE}" ; perl convert/splitCorpus.pl --in "$(NAMETAG)/$${FILE}" --out "$(TEIANA)"; done
 
 convert2teitok:
 	mkdir -p $(TEITOK)

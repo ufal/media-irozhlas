@@ -85,7 +85,7 @@
       <xsl:apply-templates select="../title"/>
       <xsl:element name="div">
         <xsl:attribute name="type">perex</xsl:attribute>
-        <xsl:element name="seg">
+        <xsl:element name="p">
           <xsl:value-of select="."/>
         </xsl:element>
       </xsl:element>
@@ -102,7 +102,7 @@
   </xsl:template>
 
   <xsl:template match="p[.//text()[string-length(normalize-space()) > 0 ] ]" mode="html">
-    <xsl:element name="seg">
+    <xsl:element name="p">
       <xsl:apply-templates select="./*|./text()" mode="paragraph" />
     </xsl:element>
   </xsl:template>

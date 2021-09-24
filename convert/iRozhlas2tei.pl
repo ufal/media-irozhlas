@@ -20,7 +20,7 @@ GetOptions ( ## Command line options
             'out-dir=s' => \$outdir
             );
 
-my @paragraph_like = qw/seg head cell/;
+my @paragraph_like = qw/p seg head cell/;
 my $json_server = iRozhlas::data::from_json_files->new(@ARGV);
 File::Path::mkpath($outdir) unless -d $outdir;
 

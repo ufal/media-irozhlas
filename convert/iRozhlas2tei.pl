@@ -20,7 +20,7 @@ GetOptions ( ## Command line options
             'out-dir=s' => \$outdir
             );
 
-my @paragraph_like = qw/p seg head cell/;
+my @paragraph_like = qw/p seg head cell li/;
 my $json_server = iRozhlas::data::from_json_files->new(@ARGV);
 File::Path::mkpath($outdir) unless -d $outdir;
 
@@ -42,12 +42,18 @@ my $pp = XML::LibXML::PrettyPrint->new(
 
 while(my $data = $json_server->next) {
 
-  my $text = $data->{text};
-  $data->{text} = '';
+  my @html_fields_names = qw/text perex/;
+  my %html_fields_content;
+  for my $f (@html_fields_names){
+    $html_fields_content{$f} = $data->{$f};
+    $data->{$f} = '';
+    $html_fields_content{$f} =~ s/&nbsp;/ /g;
+  }
   my $xml = obj2xml($data);
-  $text =~ s/&nbsp;/ /g;
-  my $html =$html_parser->parse_html_string("<html>$text</html>", { encoding => 'utf-8' });
-  $xml->find('/ROOT/text')->shift()->appendChild($html->documentElement()->cloneNode(1));
+  for my $f (keys %html_fields_content){
+    my $html =$html_parser->parse_html_string("<html>$html_fields_content{$f}</html>", { encoding => 'utf-8' });
+    $xml->find("/ROOT/$f")->shift()->appendChild($html->documentElement()->cloneNode(1));
+  }
 
   binmode STDERR;
   my $doc = $data_process->convert('tei',$xml);

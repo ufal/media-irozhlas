@@ -153,6 +153,8 @@
     </xsl:choose>
   </xsl:template>
 
+
+  <!-- TABLE -->
   <xsl:template match="table" mode="html">
     <xsl:message>TABLE </xsl:message>
     <xsl:element name="table">
@@ -182,6 +184,22 @@
     </xsl:element>
   </xsl:template>
 
+
+  <!-- LIST -->
+  <xsl:template match="ul|ol" mode="html">
+    <xsl:message>List </xsl:message>
+    <xsl:element name="list">
+      <xsl:apply-templates select="./li" mode="html" />
+    </xsl:element>
+  </xsl:template>
+  <xsl:template match="li[.//text()[string-length(normalize-space()) > 0 ] ]" mode="html">
+    <xsl:element name="item">
+      <xsl:apply-templates select="./*|./text()" mode="paragraph" />
+    </xsl:element>
+  </xsl:template>
+
+
+  <!-- TO BE REMOVED -->
   <xsl:template match="*[contains(@class,'inline')]" mode="html">
     <xsl:message>removing inline</xsl:message>
   </xsl:template>

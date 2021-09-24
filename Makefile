@@ -44,7 +44,7 @@ udpipe: lib udpipe2
 	mkdir -p $(UDPIPE)
 	perl -I lib udpipe2/udpipe2.pl --colon2underscore \
 	                             --model=czech-pdt-ud-2.6-200830 \
-	                             --elements "head,p,cell" \
+	                             --elements "head,p,cell,li" \
 	                             --debug \
 	                             --sub-elements "ref,hi" \
 	                             --filelist $(FL) \

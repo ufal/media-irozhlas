@@ -33,13 +33,14 @@
                 <xsl:value-of select="./changed" />
               </date>
               <note type="section">
-                <xsl:text>|</xsl:text>
+                <xsl:text> </xsl:text>
                 <xsl:apply-templates select="./sections/ITEM" />
               </note>
               <note type="tag">
-                <xsl:text>|</xsl:text>
+                <xsl:text> </xsl:text>
                 <xsl:apply-templates select="./tags/ITEM" />
               </note>
+              <district type="domicil"><xsl:value-of select="./domicil" /></district>
             </bibl>
           </sourceDesc>
         </fileDesc>
@@ -69,7 +70,7 @@
       <xsl:attribute name="sameAs">#sect-<xsl:value-of select="./tid"/></xsl:attribute>
       <xsl:value-of select="./name" />
     </xsl:element>
-    <xsl:text>|</xsl:text>
+    <xsl:text> </xsl:text>
   </xsl:template>
 
   <xsl:template match="ITEM[./parent::tags]">
@@ -77,7 +78,7 @@
       <xsl:attribute name="sameAs">#tag-<xsl:value-of select="./tid"/></xsl:attribute>
       <xsl:value-of select="./name" />
     </xsl:element>
-    <xsl:text>|</xsl:text>
+    <xsl:text> </xsl:text>
   </xsl:template>
 
   <xsl:template match="perex">

@@ -47,6 +47,7 @@ udpipe: lib udpipe2
 	                             --model=czech-pdt-ud-2.6-200830 \
 	                             --elements "head,p,cell,li" \
 	                             --debug \
+	                             --try2continue-on-error \
 	                             --sub-elements "ref,hi" \
 	                             --filelist $(FL) \
 	                             --input-dir $(TEI) \
@@ -85,6 +86,11 @@ create_corpus_udpipe_test:  # all-0.json issue https://github.com/ufal/ParCzech/
 	echo 'corpus.xml' > $(FL)
 
 
+TODO-prepare:
+	perl convert/iRozhlas2tei.pl --out-dir "$(TEI)" --debug $(IN)/all-15.json
+TODO:
+	echo 'doc-8285292.xml' > $(FL)
+	make udpipe
 
 prereq: udpipe2 nametag2 lib
 

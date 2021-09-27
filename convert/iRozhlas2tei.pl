@@ -79,8 +79,8 @@ sub save_tei {
   $pp->pretty_print($doc);
   my $raw = $doc->toString();
   my $text = Encode::decode("utf-8", $raw);
-  clean_spacing(\$text);
   clean_awful_characters(\$text);
+  clean_spacing(\$text);
   print FILE $text;
   close FILE;
 }
@@ -91,9 +91,10 @@ sub clean_spacing {
   local $/;
   $/ = undef;
   $$text_ref =~ s/ +((<\/[a-z]*>)+) */$1 /g; # moving ending spaces after element
-  $$text_ref =~ s/ *((<[a-z]+[^>\/]*>)+) +/ $1/g; # moving begining spaces before element
+  $$text_ref =~ s/((?:<[a-z]+[^>\/]*>)+) +/ $1/g; # moving begining spaces before element
   $$text_ref =~ s/(?:<lb\/>| )+((<\/[a-z]*>)+) */$1<lb\/> /g; # moving ending newlines after element
   $$text_ref =~ s/ *((<[a-z]+[^>\/]*>)+)(:?<lb\/>| )+/<lb\/> $1/g; # moving begining newlines before element
+  $$text_ref =~ s/ *<lb\/> */<lb\/> /g; # add space after linebreak
 }
 
 

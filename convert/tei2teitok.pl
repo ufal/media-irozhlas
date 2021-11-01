@@ -78,6 +78,16 @@ foreach $node ( $xml->findnodes("//linkGrp[\@type=\"UD-SYN\"]/link") ) {
 	};
 };
 
+# Copy head attributes to child
+for my $base ( keys %id2node ) {
+	my $head = $id2node{$base}->getAttribute("head");
+	if ( $id2node{$base} && $head && $id2node{$head} ) {
+		for my $att (qw/lemma upos xpos feats type deprel/) {
+      $id2node{$base}->setAttribute("head_$att", $id2node{$head}->getAttribute($att)) if $id2node{$head}->hasAttribute($att)
+		}
+	};
+};
+
 if ( $split_corpus ) {
   foreach $tei ($xml->findnodes("//TEI[\@id]")) {
   	my $dom = XML::LibXML::Document->new("1.0", "utf-8");

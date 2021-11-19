@@ -134,12 +134,7 @@
   </xsl:template>
 
   <xsl:template match="strong[.//text()[string-length(normalize-space()) > 0 ] ]" mode="paragraph">
-    <xsl:text> </xsl:text>
-    <xsl:element name="hi">
-      <xsl:attribute name="rend">bold</xsl:attribute>
-      <xsl:apply-templates select="*|text()" mode="paragraph" />
-    </xsl:element>
-    <xsl:text> </xsl:text>
+    <xsl:apply-templates select="*|text()" mode="paragraph" />
   </xsl:template>
 
   <xsl:template match="br" mode="paragraph">
@@ -189,24 +184,26 @@
 
   <!-- LIST -->
   <xsl:template match="ul|ol" mode="html">
-    <xsl:message>List </xsl:message>
-    <xsl:element name="list">
-      <xsl:apply-templates select="./li" mode="html" />
-    </xsl:element>
+    <xsl:apply-templates select="./li" mode="html" />
   </xsl:template>
   <xsl:template match="li[.//text()[string-length(normalize-space()) > 0 ] ]" mode="html">
-    <xsl:element name="item">
-      <xsl:apply-templates select="./*|./text()" mode="paragraph" />
-    </xsl:element>
+    <xsl:apply-templates select="./*|./text()" mode="paragraph" />
   </xsl:template>
 
 
   <!-- TO BE REMOVED -->
   <xsl:template match="*[contains(@class,'inline')]" mode="html">
-    <xsl:message>removing inline</xsl:message>
+    <!--<xsl:message>removing inline</xsl:message>-->
   </xsl:template>
   <xsl:template match="*[contains(@class,'embed')]" mode="html">
-    <xsl:message>removing embed</xsl:message>
+    <!--<xsl:message>removing embed</xsl:message>-->
+  </xsl:template>
+
+  <xsl:template match="*" mode="html">
+    <xsl:message>NO MATCH paragraph MODE <xsl:value-of select="." /></xsl:message>
+  </xsl:template>
+  <xsl:template match="*" mode="html">
+    <xsl:message>NO MATCH html MODE <xsl:value-of select="." /></xsl:message>
   </xsl:template>
 
 </xsl:stylesheet>

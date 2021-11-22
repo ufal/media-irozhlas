@@ -48,6 +48,8 @@ while(my $data = $json_server->next) {
     $html_fields_content{$f} = $data->{$f};
     $data->{$f} = '';
     $html_fields_content{$f} =~ s/&nbsp;/ /g;
+    $html_fields_content{$f} =~ s/[\r\n]/ /g;
+    $html_fields_content{$f} =~ s/  */ /g;
   }
   my $xml = obj2xml($data);
   for my $f (keys %html_fields_content){

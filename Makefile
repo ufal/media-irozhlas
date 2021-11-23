@@ -79,7 +79,7 @@ convert2conllu:
 	mkdir -p $(CONLLU)
 	for FILE in $(shell ls $(TEIANA) ) ; \
 	  do \
-	    $(SAXON) net.sf.saxon.Transform -t -s:"$(TEIANA)/$${FILE}" -xsl:"convert/tei2conllu.xsl" -o:"$(CONLLU)/$${FILE}"; \
+	    $(SAXON) net.sf.saxon.Transform -t -s:"$(TEIANA)/$${FILE}" -xsl:"convert/tei2conllu.xsl" -o:"$(CONLLU)/$${FILE}.conllu"; \
 	  done
 
 convert2txt-meta:
@@ -87,7 +87,7 @@ convert2txt-meta:
 	mkdir -p $(TXTMETA)
 	for FILE in $(shell ls $(TEIANA) ) ; \
 	  do \
-	    $(SAXON) net.sf.saxon.Transform -t -s:"$(TEIANA)/$${FILE}" -xsl:"convert/tei2txt.xsl" -o:"$(TXTMETA)/$${FILE}"; \
+	    $(SAXON) net.sf.saxon.Transform -t -s:"$(TEIANA)/$${FILE}" -xsl:"convert/tei2txt.xsl" -o:"$(TXTMETA)/$${FILE}.txt"; \
 	  done
 
 

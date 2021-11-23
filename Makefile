@@ -6,7 +6,11 @@ TEIANA := ${OUT}/tei-ana
 UDPIPE := ${OUT}/udpipe
 NAMETAG := ${OUT}/nametag
 TEITOK := ${OUT}/teitok
+CONLLU := ${OUT}/conllu
 FL := ${OUT}/tei.fl
+SAXON := $(shell sh -c 'test `hostname` = "parczech" && echo -n "java -cp /opt/tools/shared/saxon/saxon-he-10.1.jar" || echo -n "java -cp /opt/saxon/SaxonHE10-1J/saxon-he-10.1.jar"')
+
+
 
 all: convert2tei create_corpus_splitted udpipe nametag split_corpus convert2teitok
 
@@ -70,6 +74,12 @@ convert2teitok:
 	mkdir -p $(TEITOK)
 	for FILE in $(shell cat $(FL) ) ; do echo "converting: $${FILE}" ; perl convert/tei2teitok.pl --split-corpus --in "$(NAMETAG)/$${FILE}" --out "$(TEITOK)"; done
 
+convert2conllu:
+	mkdir -p $(CONLLU)
+	for FILE in $(shell ls $(TEIANA) ) ; \
+	  do \
+	    $(SAXON) net.sf.saxon.Transform -t -s:"$(TEIANA)/$${FILE}" -xsl:"convert/tei2conllu.xsl" -o:"$(CONLLU)/$${FILE}"; \
+	  done
 
 
 

@@ -67,7 +67,6 @@
       <xsl:when test="tei:s">
 	  <xsl:value-of select="concat('# newpar id = ', @xml:id, '&#10;')"/>
 	  <xsl:apply-templates select="tei:s"/>
-	</xsl:if>
       </xsl:when>
       <xsl:otherwise>
 	<xsl:message>

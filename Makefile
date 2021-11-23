@@ -18,7 +18,7 @@ convert2tei: clean
 
 convert2tei_sample: clean
 	mkdir -p $(TEI)
-	perl convert/iRozhlas2tei.pl --out-dir "$(TEI)" --debug $(IN)/all-62.json
+	perl convert/iRozhlas2tei.pl --out-dir "$(TEI)" --debug $(IN)/all-76.json
 
 create_corpus:
 	echo '<?xml version="1.0" encoding="utf-8"?>' > $(TEI)/corpus.xml
@@ -85,6 +85,20 @@ create_corpus_udpipe_test:  # all-0.json issue https://github.com/ufal/ParCzech/
 	echo '</teiCorpus>' >> $(TEI)/corpus.xml
 	echo 'corpus.xml' > $(FL)
 
+
+issue-13-patch:
+	sed -i 's/&#13;/ /g;s/ +/ /g' $(TEI)/corpus-1010.xml
+
+issue-13: clean
+	mkdir -p $(TEI)
+	cp -r test-data/issue-13/tei "$(OUT)"
+	#make issue-13-patch
+	ls  "$(TEI)" > $(FL)
+	#echo  "corpus-1010.xml" > $(FL)
+	#echo  "doc-5995242.xml" > $(FL)
+	cat $(FL)
+	make udpipe
+	#xmllint --noout $(UDPIPE)/corpus-*.xml
 
 TODO-prepare:
 	perl convert/iRozhlas2tei.pl --out-dir "$(TEI)" --debug $(IN)/all-15.json

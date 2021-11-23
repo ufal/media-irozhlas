@@ -7,6 +7,7 @@ UDPIPE := ${OUT}/udpipe
 NAMETAG := ${OUT}/nametag
 TEITOK := ${OUT}/teitok
 CONLLU := ${OUT}/conllu
+TXTMETA := ${OUT}/txt-meta
 FL := ${OUT}/tei.fl
 SAXON := $(shell sh -c 'test `hostname` = "parczech" && echo -n "java -cp /opt/tools/shared/saxon/saxon-he-10.1.jar" || echo -n "java -cp /opt/saxon/SaxonHE10-1J/saxon-he-10.1.jar"')
 
@@ -81,6 +82,13 @@ convert2conllu:
 	    $(SAXON) net.sf.saxon.Transform -t -s:"$(TEIANA)/$${FILE}" -xsl:"convert/tei2conllu.xsl" -o:"$(CONLLU)/$${FILE}"; \
 	  done
 
+convert2txt-meta:
+	echo "TODO: test output !!!"
+	mkdir -p $(TXTMETA)
+	for FILE in $(shell ls $(TEIANA) ) ; \
+	  do \
+	    $(SAXON) net.sf.saxon.Transform -t -s:"$(TEIANA)/$${FILE}" -xsl:"convert/tei2txt.xsl" -o:"$(TXTMETA)/$${FILE}"; \
+	  done
 
 
 #################

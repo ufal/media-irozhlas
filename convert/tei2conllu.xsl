@@ -42,7 +42,7 @@
   </xsl:template>
 
   <xsl:template match="tei:text">
-    <xsl:value-of select="concat('# stats = |words=', count(.//tei:w),'|sentences=',count(.//tei:s),'|paragraphs=',count(.//tei:head|//tei:p|//tei:cell|//tei:li),'|', '&#10;')"/>
+    <xsl:value-of select="concat('# stats = |words=', count(.//tei:w[not(@norm)]),'|sentences=',count(.//tei:s),'|paragraphs=',count(.//tei:head|//tei:p|//tei:cell|//tei:li),'|', '&#10;')"/>
     <xsl:apply-templates/>
   </xsl:template>
 

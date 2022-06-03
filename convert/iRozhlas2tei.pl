@@ -106,6 +106,8 @@ sub clean_awful_characters {
   $/ = undef;
   $$text_ref =~ tr/\x{200B}\x{00AD}//d;
   $$text_ref =~ tr/\x{202F}\x{00A0}/  /;
+  $$text_ref =~ s/[\x{2018}-\x{201F}]/"/g;
+  $$text_ref =~ s/[\x{2010}-\x{2015}]/-/g;
   $$text_ref =~ tr/[\x{2000}-\x{FFFF}]//d;
 }
 

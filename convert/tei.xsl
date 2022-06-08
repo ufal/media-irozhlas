@@ -97,7 +97,7 @@
     <xsl:element name="body">
       <xsl:element name="div">
         <xsl:attribute name="type">text</xsl:attribute>
-        <xsl:apply-templates select="./html/body/node()" mode="html" />
+        <xsl:apply-templates select="./html/body/*" mode="html" />
       </xsl:element>
     </xsl:element>
   </xsl:template>
@@ -205,5 +205,10 @@
   <xsl:template match="*" mode="html">
     <xsl:message>NO MATCH html MODE <xsl:value-of select="." /></xsl:message>
   </xsl:template>
-
+  <xsl:template match="text()" mode="html">
+    <xsl:message>REMOVING text between paragraphs: <xsl:value-of select="." /></xsl:message>
+  </xsl:template>
+  <xsl:template match="p[@dir and @lang]" mode="html">
+    <xsl:message>REMOVING twitter embedding: <xsl:value-of select="." /></xsl:message>
+  </xsl:template>
 </xsl:stylesheet>

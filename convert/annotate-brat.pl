@@ -2,8 +2,6 @@
 
 use warnings;
 use strict;
-use open qw(:std :utf8);
-use utf8;
 use XML::LibXML;
 use Getopt::Long;
 use List::Util;
@@ -115,8 +113,10 @@ my ($spanGrp_node, $linkGrp_node);
 
 if(my $text_node = $xml->findnodes("//*[local-name() = 'text'][1]")->[0]){
   $spanGrp_node = $text_node->addNewChild('http://www.tei-c.org/ns/1.0','spanGrp');
+  $spanGrp_node->setAttribute('type','ATTRIBUTION');
   $linkGrp_node = $text_node->addNewChild('http://www.tei-c.org/ns/1.0','linkGrp');
   $linkGrp_node->setAttribute('targFunc','head argument');
+  $linkGrp_node->setAttribute('type','ATTRIBUTION');
 
 } else {
 	die "missing text element"

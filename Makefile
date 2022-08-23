@@ -3,9 +3,12 @@ IN := ${DATA}data-in
 OUT := ${DATA}data-out
 TEI := ${OUT}/tei
 TEIANA := ${OUT}/tei-ana
+BRAT := ${OUT}/brat
+TEIANABRAT := ${OUT}/tei-ana-brat
 UDPIPE := ${OUT}/udpipe
 NAMETAG := ${OUT}/nametag
 TEITOK := ${OUT}/teitok
+TEITOKBRAT := ${OUT}/teitok-brat
 CONLLU := ${OUT}/conllu
 TXTMETA := ${OUT}/txt-meta
 FL := ${OUT}/tei.fl
@@ -91,7 +94,35 @@ convert2txt-meta:
 	  done
 
 
-#################
+annotate-brat:
+	mkdir -p $(TEIANABRAT)
+	for FILE in $(shell cat $(FL) ) ; do \
+	  echo "converting: $${FILE}" ; \
+	  perl convert/annotate-brat.pl --in "$(TEIANA)/$${FILE}" \
+	                                --ana "$(BRAT)/$${FILE}.ann" \
+	                                --txt "$(BRAT)/$${FILE}.txt" \
+	                                --out "$(TEIANABRAT)/$${FILE}"; \
+	done
+
+convert2teitok-brat:
+	mkdir -p $(TEITOKBRAT)
+	echo "==================== TODO: implement brat annotation in teitok conversion"
+	for FILE in $(shell cat $(FL) ) ; do echo "converting: $${FILE}" ; perl convert/tei2teitok.pl --in "$(TEIANABRAT)/$${FILE}" --out "$(TEITOKBRAT)"; done
+
+
+################# DEVEL:
+
+DEV-brat-prepare: clean
+	mkdir -p $(BRAT) $(TEIANA)
+	rsync -av signal_a_sum/data/iRozhlas_and_Verifee/2022_07_data_final/manual/triple_unified_curated/ $(BRAT)
+	rsync -av data-out-annotated-sample-20220611/data-out/tei-ana/ $(TEIANA)
+	echo "adding single file !!!"
+	ls  "$(TEIANA)" > $(FL)
+	find $(OUT)
+
+
+
+
 convert2tei-sample: clean
 	mkdir -p $(TEI)
 	perl convert/iRozhlas2tei.pl --out-dir "$(TEI)" --debug small-sample.json
@@ -118,12 +149,23 @@ issue-13: clean
 	make udpipe
 	#xmllint --noout $(UDPIPE)/corpus-*.xml
 
+issue-20:
+	rm -rf data-out-test
+	mkdir -p data-out-test
+	perl convert/iRozhlas2tei.pl --out-dir "data-out-test" --debug data-in-test/issue20.json
+	cat data-out-test/doc-6675116.xml|grep -v '<' || :
+	cat data-out-test/doc-6675116.xml|grep 'pic.twitter.' || :
+
+
 TODO-prepare:
 	perl convert/iRozhlas2tei.pl --out-dir "$(TEI)" --debug $(IN)/all-15.json
 TODO:
 	echo 'doc-8285292.xml' > $(FL)
 	make udpipe
 
+
+
+##################
 prereq: udpipe2 nametag2 lib
 
 udpipe2:

@@ -54,6 +54,7 @@ $ana{pos} = {}; # start => T#
 $ana{id} = {}; # mapping T# -> xml:id
 my $cnt = 1;
 while(my $line = <FILE>) {
+	$line =~ s/[ \n]*$//;
   my @line = $line =~ m/^([TR]\d+)\t([^\s]*) (?:Arg1:)?([^\s]*) (?:Arg2:)?([^\s]*)\t? *(.*?)[ \n]*$/;
   my %hash;
   my @keys;
@@ -66,6 +67,7 @@ while(my $line = <FILE>) {
   }
   if(@keys){
     @hash{@keys} = @line;
+    $hash{line} = $line;
     $ana{substr($hash{brat_id},0,1)}->{$hash{brat_id}} = \%hash ;
     $ana{pos}->{$hash{start}} = $hash{brat_id} if $hash{start};
   }
@@ -126,7 +128,7 @@ for my $mwe (sort {$a->{start} <=> $b->{start}} values %{$ana{T}}){
   my @tokens;
   my $token;
   $token = $token_text_map{$aligned_indexes{$mwe->{start}}->[0]};
-  if($token->{last_pos} <= $aligned_indexes{$mwe->{end}}->[0]){
+  if($token){
     push @tokens,$token->{id};
     while($token && $token->{next_pos} < $aligned_indexes{$mwe->{end}}->[0]){
       $token = $token_text_map{$token->{next_pos}};
@@ -146,6 +148,8 @@ for my $mwe (sort {$a->{start} <=> $b->{start}} values %{$ana{T}}){
       $span->setAttribute('target',join(' ',map {"#$_"} @tokens));
       $mwe_cnt++
     }
+  } else {
+  	print STDERR "ERROR: token not found - '",$mwe->{line},"'"
   }
 }
 

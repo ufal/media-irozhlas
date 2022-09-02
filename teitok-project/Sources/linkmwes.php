@@ -27,7 +27,7 @@
 			);
 	$typejson = array2json($linkmweslist);
 	$linkto = 'attrib_signal';
-	$colorattr = 'attrib_type';
+	$colorattr = 'attribtype';
 
 /*
 	$nn2rn = array (

@@ -3,7 +3,7 @@
   <desc>
     Annotation of signal and source.
   </desc>
-  <interp key="code" display="Code" long="Argument Type" colored="1">
+  <interp key="attribtype" display="Code" long="Argument Type" colored="1">
     <option value="PHRASE">Phrase</option>
     <option value="anonymous">anonymous</option>
     <option value="anonymous-partial">anonymous-partial</option>

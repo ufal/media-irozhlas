@@ -95,7 +95,7 @@ foreach $node ( $xml->findnodes("//span") ) {
 	if($node->hasAttribute('ana')) {
 		my $val = $node->getAttribute('ana');
 		$val =~ s/^.*\b${stand_off_pref}:([^ "]+).*?/$1/;
-		$node->setAttribute("${stand_off_pref}_type", $val) if $val;
+		$node->setAttribute("${stand_off_pref}type", $val) if $val;
 		$node->removeAttribute('ana');
 	}
 	if($node->hasAttribute('target')) {

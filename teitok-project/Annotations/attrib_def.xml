@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<interpGrp id="attrib" name="Attribution Structure">
+  <desc>
+    Annotation of signal and source.
+  </desc>
+  <interp key="code" display="Code" long="Argument Type" colored="1">
+    <option value="PHRASE">Phrase</option>
+    <option value="anonymous">anonymous</option>
+    <option value="anonymous-partial">anonymous-partial</option>
+    <option value="official-non-political">official-non-political</option>
+    <option value="official-political">official-political</option>
+    <option value="unofficial">unofficial</option>
+  </interp>
+</interpGrp>

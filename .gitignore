@@ -1,5 +1,8 @@
 /udpipe2
 /nametag2
 /lib
-/data-in
-/data-out
+/*data*
+*.zip
+*.gz
+*.tsv
+*TMP*

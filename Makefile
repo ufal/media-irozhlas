@@ -9,6 +9,8 @@ UDPIPE := ${OUT}/udpipe
 NAMETAG := ${OUT}/nametag
 TEITOK := ${OUT}/teitok
 TEITOKBRAT := ${OUT}/teitok-brat
+TEITOKANNOTATIONS := ${OUT}/teitok-annotations
+
 CONLLU := ${OUT}/conllu
 TXTMETA := ${OUT}/txt-meta
 FL := ${OUT}/tei.fl
@@ -107,10 +109,28 @@ annotate-brat:
 convert2teitok-brat:
 	mkdir -p $(TEITOKBRAT)
 	echo "==================== TODO: implement brat annotation in teitok conversion"
-	for FILE in $(shell cat $(FL) ) ; do echo "converting: $${FILE}" ; perl convert/tei2teitok.pl --in "$(TEIANABRAT)/$${FILE}" --out "$(TEITOKBRAT)"; done
+	for FILE in $(shell cat $(FL) ) ; \
+	  do echo "converting: $${FILE}" ; \
+	  perl convert/tei2teitok.pl --in "$(TEIANABRAT)/$${FILE}" \
+	                             --out "$(TEITOKBRAT)/$${FILE}" \
+	                             --stand-off-type "ATTRIBUTION" \
+	                             --stand-off-pref "attrib"; \
+	  done
 
 
 ################# DEVEL:
+
+
+DEV-sync-sir-with-teitok:
+	rm  $(TEITOKANNOTATIONS)/*
+	mkdir -p $(TEITOKANNOTATIONS)
+	ls $(TEITOKBRAT) | xargs -I {} ln -s ../xmlfiles/{} $(TEITOKANNOTATIONS)/attrib_{}
+	rsync -avz --recursive $(TEITOKANNOTATIONS)/* parczech@parczech:/var/www/html/teitok/sir/Annotations/
+	rsync -avz  teitok-project/Annotations/attrib_def.xml parczech@parczech:/var/www/html/teitok/sir/Annotations/attrib_def.xml
+	rsync -avz --recursive $(TEITOKBRAT)/* parczech@parczech:/var/www/html/teitok/sir/xmlfiles/
+	rsync -avz --recursive teitok-project/Sources parczech@parczech:/var/www/html/teitok/sir/
+	rsync -avz --recursive teitok-project/Scripts parczech@parczech:/var/www/html/teitok/sir/
+
 
 DEV-brat-prepare: clean
 	mkdir -p $(BRAT) $(TEIANA)

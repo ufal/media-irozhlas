@@ -117,7 +117,7 @@ if(my $text_node = $xml->findnodes("//*[local-name() = 'text'][1]")->[0]){
   $spanGrp_node = $text_node->addNewChild('http://www.tei-c.org/ns/1.0','spanGrp');
   $spanGrp_node->setAttribute('type','ATTRIBUTION');
   $linkGrp_node = $text_node->addNewChild('http://www.tei-c.org/ns/1.0','linkGrp');
-  $linkGrp_node->setAttribute('targFunc','head argument');
+  $linkGrp_node->setAttribute('targFunc','signal source');
   $linkGrp_node->setAttribute('type','ATTRIBUTION');
 
 } else {

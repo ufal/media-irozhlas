@@ -16,6 +16,7 @@ TXTMETA := ${OUT}/txt-meta
 FL := ${OUT}/tei.fl
 SAXON := $(shell sh -c 'test `hostname` = "parczech" && echo -n "java -cp /opt/tools/shared/saxon/saxon-he-10.1.jar" || echo -n "java -cp /opt/saxon/SaxonHE10-1J/saxon-he-10.1.jar"')
 
+SUBCORPUS =
 
 
 all: convert2tei create_corpus_splitted udpipe nametag split_corpus convert2teitok
@@ -98,22 +99,24 @@ convert2txt-meta:
 
 annotate-brat:
 	mkdir -p $(TEIANABRAT)
-	for FILE in $(shell cat $(FL) ) ; do \
+	for FILE in $(shell cat $(FL)$(SUBCORPUS) ) ; do \
 	  echo "converting: $${FILE}" ; \
 	  perl convert/annotate-brat.pl --in "$(TEIANA)/$${FILE}" \
 	                                --ana "$(BRAT)/$${FILE}.ann" \
 	                                --txt "$(BRAT)/$${FILE}.txt" \
-	                                --out "$(TEIANABRAT)/$${FILE}"; \
+	                                --out "$(TEIANABRAT)/$${FILE}" \
+	                                --subcorpus "$(SUBCORPUS)"; \
 	done
 
 convert2teitok-brat:
 	mkdir -p $(TEITOKBRAT)
 	echo "==================== TODO: implement brat annotation in teitok conversion"
-	for FILE in $(shell cat $(FL) ) ; \
+	for FILE in $(shell cat $(FL)* ) ; \
 	  do echo "converting: $${FILE}" ; \
 	  perl convert/tei2teitok.pl --in "$(TEIANABRAT)/$${FILE}" \
 	                             --out "$(TEITOKBRAT)/$${FILE}" \
 	                             --stand-off-type "ATTRIBUTION" \
+	                             --stand-off-val-patch '^(.*(?:official|anonymous).*)$$/SOURCE:$$1' \
 	                             --stand-off-pref "attrib"; \
 	  done
 
@@ -122,7 +125,7 @@ convert2teitok-brat:
 
 
 DEV-sync-sir-with-teitok:
-	rm  $(TEITOKANNOTATIONS)/*
+	rm -f $(TEITOKANNOTATIONS)/*
 	mkdir -p $(TEITOKANNOTATIONS)
 	ls $(TEITOKBRAT) | xargs -I {} ln -s ../xmlfiles/{} $(TEITOKANNOTATIONS)/attrib_{}
 	rsync -avz --recursive $(TEITOKANNOTATIONS)/* parczech@parczech:/var/www/html/teitok/sir/Annotations/
@@ -135,12 +138,19 @@ DEV-sync-sir-with-teitok:
 DEV-brat-prepare: clean
 	mkdir -p $(BRAT) $(TEIANA)
 	rsync -av signal_a_sum/data/iRozhlas_and_Verifee/2022_07_data_final/manual/triple_unified_curated/ $(BRAT)
-	rsync -av data-out-annotated-sample-20220611/data-out/tei-ana/ $(TEIANA)
+	rsync -av signal_a_sum/data/iRozhlas_and_Verifee/2022_07_data_final/double_unified/ $(BRAT)
+	rsync -av signal_a_sum/data/iRozhlas_and_Verifee/2022_07_data_final/single/ $(BRAT)
 	echo "adding single file !!!"
-	ls  "$(TEIANA)" > $(FL)
+	ls signal_a_sum/data/iRozhlas_and_Verifee/2022_07_data_final/manual/triple_unified_curated/|sed 's/\.[a-z]*$$//'|sort|uniq > "$(FL)triple_unified_curated"
+	ls signal_a_sum/data/iRozhlas_and_Verifee/2022_07_data_final/double_unified/|sed 's/\.[a-z]*$$//'|sort|uniq > "$(FL)double_unified"
+	ls signal_a_sum/data/iRozhlas_and_Verifee/2022_07_data_final/single/|sed 's/\.[a-z]*$$//'|sort|uniq > "$(FL)single"
+	rsync -av data-out-annotated-sample-20220611/data-out/tei-ana/ $(TEIANA)
 	find $(OUT)
 
-
+DEV-annotate-brat:
+	make annotate-brat SUBCORPUS=triple_unified_curated
+	make annotate-brat SUBCORPUS=double_unified
+	make annotate-brat SUBCORPUS=single
 
 
 convert2tei-sample: clean

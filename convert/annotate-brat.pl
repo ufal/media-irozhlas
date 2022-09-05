@@ -12,7 +12,7 @@ use Data::Dumper qw(Dumper);
 
 binmode(STDOUT, ":utf8");
 
-my ($debug,$verbose,$filename,$anafilename,$txtfilename,$outfile);
+my ($debug,$verbose,$filename,$anafilename,$txtfilename,$outfile,$subcorpus);
 GetOptions (
             'debug' => \$debug,
             'verbose' => \$verbose,
@@ -20,6 +20,7 @@ GetOptions (
             'ana=s' => \$anafilename,
             'txt=s' => \$txtfilename,
             'out=s' => \$outfile,
+            'subcorpus=s' => \$subcorpus,
         );
 
 if ( !$filename ) { $filename = shift; };
@@ -162,6 +163,8 @@ for my $rel (sort {$a->{brat_id} cmp $b->{brat_id}} values %{$ana{R}}){
   print join(" ==(".$rel->{ana}.")==> " ,map {sprintf("%s [%s](%s)",$_->{text},$_->{tei_id},$_->{ana})} map {$ana{T}->{$rel->{$_}}} qw/from to/),"\n";
 }
 
+append_attribute($xml->documentElement(),'ana',"#$subcorpus") if $subcorpus;
+
 open FILE, ">$outfile";
 # binmode(FILE, ":utf8");
 print FILE $xml->toString;
@@ -209,4 +212,9 @@ sub align_text { # Needleman-Wunsch algorithm
   push @alignment, [$i,--$j] while $j > 0;
 
   return [reverse @alignment];
+}
+
+sub append_attribute {
+	my ($node,$name,$value) = @_;
+	$node->setAttribute($name, ($node->hasAttribute($name) ? $node->getAttribute($name).' ' : '') . $value);
 }

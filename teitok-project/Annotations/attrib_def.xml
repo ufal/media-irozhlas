@@ -5,10 +5,10 @@
   </desc>
   <interp key="attribtype" display="Code" long="Argument Type" colored="1">
     <option value="PHRASE">Phrase</option>
-    <option value="anonymous">anonymous</option>
-    <option value="anonymous-partial">anonymous-partial</option>
-    <option value="official-non-political">official-non-political</option>
-    <option value="official-political">official-political</option>
-    <option value="unofficial">unofficial</option>
+    <option value="SOURCE:anonymous">anonymous</option>
+    <option value="SOURCE:anonymous-partial">anonymous-partial</option>
+    <option value="SOURCE:official-non-political">official-non-political</option>
+    <option value="SOURCE:official-political">official-political</option>
+    <option value="SOURCE:unofficial">unofficial</option>
   </interp>
 </interpGrp>

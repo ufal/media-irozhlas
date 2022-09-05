@@ -1,5 +1,6 @@
 use XML::LibXML;
 use Getopt::Long;
+use String::Substitution;
 
 $\ = "\n"; $, = "\t";
 
@@ -12,6 +13,7 @@ GetOptions (
             'out=s' => \$outfile,
             'stand-off-type=s' => \$stand_off_type, # create standoff annotations in spanGrp with type
             'stand-off-pref=s' => \$stand_off_pref, # create standoff annotations from prefix
+            'stand-off-val-patch=s' => \$stand_off_val_patch,
             'split-corpus' => \$split_corpus,
         );
 
@@ -38,7 +40,8 @@ eval {
 my $spanGrp;
 my $linkGrp;
 my %word_to_span_id;
-
+my $stand_off_pref_abbr;
+my ($stand_off_val_patch_from,$stand_off_val_patch_to);
 if($make_standoff){
 	die "make standoff is supported only on a single TEI file\n" if $xml->findnodes('/teiCorpus');
 	($spanGrp) = $xml->findnodes("//spanGrp[\@type=\"$stand_off_type\"]");
@@ -48,6 +51,10 @@ if($make_standoff){
 	}
 	($linkGrp) = $xml->findnodes("//linkGrp[\@type=\"$stand_off_type\"]");
 	print STDERR "LINKGRP:$linkGrp\n";
+  $stand_off_pref_abbr = substr($stand_off_pref,0,1);
+  ($stand_off_val_patch_from,$stand_off_val_patch_to) = split('/', $stand_off_val_patch//'');
+  #$stand_off_val_patch_from = eval("qr/${stand_off_val_patch_from}/") if $stand_off_val_patch_from;
+  ##$stand_off_val_patch_to = eval("${stand_off_val_patch_to}") if $stand_off_val_patch_to;
 }
 
 # Rename <w> to <tok>
@@ -95,7 +102,8 @@ foreach $node ( $xml->findnodes("//span") ) {
 	if($node->hasAttribute('ana')) {
 		my $val = $node->getAttribute('ana');
 		$val =~ s/^.*\b${stand_off_pref}:([^ "]+).*?/$1/;
-		$node->setAttribute("${stand_off_pref}type", $val) if $val;
+    String::Substitution::sub_modify($val,$stand_off_val_patch_from,$stand_off_val_patch_to) if $stand_off_val_patch;
+    $node->setAttribute("${stand_off_pref_abbr}type", $val) if $val;
 		$node->removeAttribute('ana');
 	}
 	if($node->hasAttribute('target')) {

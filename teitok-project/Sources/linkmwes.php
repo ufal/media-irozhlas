@@ -10,10 +10,10 @@
 		or 
 		$linkmweslist = array(
 			"phrase" => array ("display" => "phrase", "cqp" => "phrase", "value" => "PHRASE" ),
-			"anonymous" => array ("display" => "anonymous", "cqp" => "anonymous", "value" => "anonymous" ),
-			"anonymous-partial" => array ("display" => "anonymous-partial", "cqp" => "anonymous-partial", "value" => "anonymous-partial" ),
-			"official-non-political" => array ("display" => "official-non-political", "cqp" => "official-non-political", "value" => "official-non-political" ),
-			"official-political" => array ("display" => "official-political", "cqp" => "official-political", "value" => "official-political" ),
+			"SOURCE:anonymous" => array ("display" => "SOURCE:anonymous", "cqp" => "SOURCE:anonymous", "value" => "SOURCE:anonymous" ),
+			"SOURCE:anonymous-partial" => array ("display" => "SOURCE:anonymous-partial", "cqp" => "SOURCE:anonymous-partial", "value" => "SOURCE:anonymous-partial" ),
+			"SOURCE:official-non-political" => array ("display" => "SOURCE:official-non-political", "cqp" => "SOURCE:official-non-political", "value" => "SOURCE:official-non-political" ),
+			"official-political" => array ("display" => "SOURCE:official-political", "cqp" => "SOURCE:official-political", "value" => "SOURCE:official-political" ),
 
 			//"placename" => array ( "display" => "Place Name", "cqp" => "place", "node" => "place", "elm" => "placeName", "linkmwesid" => "ref" ),
 			//"persname" => array ( "display" => "Person Name", "cqp" => "person", "node" => "person", "elm" => "persName", "linkmwesid" => "ref" ),
@@ -27,7 +27,7 @@
 			);
 	$typejson = array2json($linkmweslist);
 	$linkto = 'attrib_signal';
-	$colorattr = 'attribtype';
+	$colorattr = 'atype';
 
 /*
 	$nn2rn = array (

@@ -17,10 +17,17 @@ if ( !tokinfo ) {
 tokinfo.style.width='max-content';
 
 if ( jmp ) { 
-	var it = document.getElementById(jmp);
-	it.style['backgroundColor'] = '#ffffbb'; 
-	it.scrollIntoView(true); 
-}; // TODO: this should depend on jmp
+	console.log(jmp);
+	jmp.split(" ").forEach(function (item) {
+  	var it = document.getElementById(item);
+  	if(it){
+	    it.style['backgroundColor'] = '#ffffbb';
+	    it.scrollIntoView(true);
+	  } else {
+	  	console.log("element with id='"+item+"' not found");
+	  }
+	});
+};
 
 var linkmwescolor;
 for ( var i=0; i<Object.keys(linkmweslist).length; i++) {

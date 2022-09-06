@@ -5,8 +5,9 @@ var seq = []; var selstring = '';
 var colorlist = ['#990000', '#009900', '#000099', '#999900', '#990099', '#009999', '#990000', '#009900', '#000099', '#999900', '#990099', '#009999', '#990000', '#009900', '#000099', '#999900', '#990099', '#009999', '#990000', '#009900', '#000099', '#999900', '#990099', '#009999']
 var setcolor = [];
 
-var annotatorlist = ['','1','2']
-var annotatorlinelist = [false,{len: 2, gap: 2},{len: 6, gap: 2}]
+var annotatorlist = ['','1','2'];
+var annotatorlinelist = [false,{len: 2, gap: 2},{len: 6, gap: 2}];
+var annotatorborderlist = ['solid','dotted','dashed'];
 
 var tokinfo = document.getElementById('tokinfo');
 if ( !tokinfo ) {
@@ -79,7 +80,7 @@ for ( var i=0; i<Object.keys(linkmweslist).length; i++) {
     }
 
 
-		set_elems(it, itcolor);
+		set_elems(it, itcolor,annotatorborderlist[j]);
 		/*
 		// it.style['font-weight'] = 'bold';
 		it.onclick = function(event) {
@@ -120,25 +121,26 @@ function get_line_point ( elm ) {
 	return elm;
 }
 
-function set_elems ( elm, itcolor ) {
+function set_elems ( elm, itcolor,borderStyle ) {
 	if(elm.getAttribute('corresp')){
-		elm.getAttribute('corresp').split(" ").forEach(function (item) {
+		elm.getAttribute('corresp').split(" ").forEach(function (item, idx, arr) {
 			var e = document.getElementById(item.substring(item.indexOf('#')+1,item.length));
 			if(e){
-			  set_elem(e, itcolor, elm);
+			  set_elem(e, itcolor, borderStyle, elm);
 			  var sp = e.nextSibling;
-			  if(sp&&sp.nodeName === 'NJS') set_elem(sp, itcolor, elm);
+			  console.log(idx,sp);
+			  if( (idx + 1 < arr.length) && sp && sp.nodeName === 'NJS') set_elem(sp, itcolor, borderStyle, elm);
 		  }
 		});
 	}
-	set_elem(elm, itcolor, elm);
+	set_elem(elm, itcolor, borderStyle, elm);
 }
 
-function set_elem (elm, itcolor, main_elem) {
+function set_elem (elm, itcolor, borderStyle, main_elem) {
 	elm.style.color = itcolor;
 	elm.style.borderBottomWidth = '2pt';
 	elm.style.borderBottomColor = itcolor;
-	elm.style.borderBottomStyle = 'solid';
+	elm.style.borderBottomStyle = borderStyle;
 	elm.onmouseover = function(event) {
 			showinfo(main_elem,elm);
 	};

@@ -13,7 +13,8 @@
 			"SOURCE:anonymous" => array ("display" => "SOURCE:anonymous", "cqp" => "SOURCE:anonymous", "value" => "SOURCE:anonymous" ),
 			"SOURCE:anonymous-partial" => array ("display" => "SOURCE:anonymous-partial", "cqp" => "SOURCE:anonymous-partial", "value" => "SOURCE:anonymous-partial" ),
 			"SOURCE:official-non-political" => array ("display" => "SOURCE:official-non-political", "cqp" => "SOURCE:official-non-political", "value" => "SOURCE:official-non-political" ),
-			"official-political" => array ("display" => "SOURCE:official-political", "cqp" => "SOURCE:official-political", "value" => "SOURCE:official-political" ),
+			"SOURCE:official-political" => array ("display" => "SOURCE:official-political", "cqp" => "SOURCE:official-political", "value" => "SOURCE:official-political" ),
+			"SOURCE:unofficial" => array ("display" => "SOURCE:unofficial", "cqp" => "SOURCE:unofficial", "value" => "SOURCE:unofficial" ),
 
 			//"placename" => array ( "display" => "Place Name", "cqp" => "place", "node" => "place", "elm" => "placeName", "linkmwesid" => "ref" ),
 			//"persname" => array ( "display" => "Person Name", "cqp" => "person", "node" => "person", "elm" => "persName", "linkmwesid" => "ref" ),

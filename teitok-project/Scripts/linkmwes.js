@@ -17,7 +17,6 @@ if ( !tokinfo ) {
 tokinfo.style.width='max-content';
 
 if ( jmp ) { 
-	console.log(jmp);
 	jmp.split(" ").forEach(function (item) {
   	var it = document.getElementById(item);
   	if(it){
@@ -76,7 +75,6 @@ for ( var i=0; i<Object.keys(linkmweslist).length; i++) {
     	  var representant_to = document.getElementById(item);
     	  assign_line(it,line,'start');
     	  assign_line(representant_to,line,'end');
-    	  console.log("line:",it,line_from,line_to);
     	});
     }
 
@@ -176,9 +174,6 @@ function showinfo(main_elem,elm) {
 	tokinfo.style.color = main_elem.style.color;
 	tokinfo.style.fontWeight = 'bold';
   tokinfo.innerHTML = main_elem.getAttribute(colorattr);
-
-console.log(tokinfo, elm);
-
 };
 
 

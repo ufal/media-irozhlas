@@ -149,8 +149,8 @@ foreach $node ( $xml->findnodes("//linkGrp[\@type=\"$stand_off_type\"]/link") ) 
 	$head = $word_to_span_id{$head} // $head;
 	print STDERR "$base -> $head\n";
 	if ( $id2node{$base} && $id2node{$head} ) {
-		append_attribute($id2node{$base},"${stand_off_pref}_$t1", $id2node{$head}->getAttribute("id"));
-		append_attribute($id2node{$head},"${stand_off_pref}_$t2", $id2node{$base}->getAttribute("id"));
+		append_attribute($id2node{$base},"${stand_off_pref_abbr}$t1", $id2node{$head}->getAttribute("id"));
+		append_attribute($id2node{$head},"${stand_off_pref_abbr}$t2", $id2node{$base}->getAttribute("id"));
 
 	};
 };

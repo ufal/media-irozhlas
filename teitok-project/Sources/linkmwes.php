@@ -27,7 +27,7 @@
 			// "unit" => array ( "display" => "Unit", "cqp" => "unit", "elm" => "unit", "linkmwesid" => "none" ),
 			);
 	$typejson = array2json($linkmweslist);
-	$linkto = 'attrib_signal';
+	$linkto = 'asignal';
 	$colorattr = 'atype';
 
 /*

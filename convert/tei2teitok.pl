@@ -11,6 +11,7 @@ GetOptions (
             'verbose' => \$verbose,
             'in=s' => \$filename,
             'out=s' => \$outfile,
+            'ana-to-attribute-value=s' => \$ana_to_attribute_value, # move ana values to separate attribute
             'stand-off-type=s' => \$stand_off_type, # create standoff annotations in spanGrp with type
             'stand-off-pref=s' => \$stand_off_pref, # create standoff annotations from prefix
             'stand-off-val-patch=s' => \$stand_off_val_patch,
@@ -165,6 +166,32 @@ for my $base ( keys %id2node ) {
 		}
 	};
 };
+
+# ana to attribute-value processing
+
+my @attribute_value_fixtures = map {["$_=$_" =~ m/^([^=]*)=([^=]*)=([^=]*)/ ]} split(/  */,$ana_to_attribute_value//'');
+for my $a (@attribute_value_fixtures){
+	my ($old_val,$new_attr,$new_val) = @$a;
+	foreach $node ( $xml->findnodes("//*[contains(concat(' ',\@ana,' '),' $old_val ')]") ) {
+		my $ana = $node->getAttribute('ana');
+    $ana =~ s/$old_val\b//g;
+    $ana =~ s/  *//g;
+    $ana =~ s/^ | $//g;
+    if($ana) {
+		  $node->setAttribute('ana',$ana)
+		} else {
+      $node->removeAttribute('ana');
+    }
+    if($node->hasAttribute($new_attr)){
+    	print STDERR "WARN: attribute $new_attr already exists:$node\n";
+    	$ana .= ' '.$node->getAttribute($new_attr);
+    }
+    $node->setAttribute($new_attr,$new_val);
+	}
+}
+
+
+#------------
 
 if ( $split_corpus ) {
   foreach $tei ($xml->findnodes("//TEI[\@id]")) {

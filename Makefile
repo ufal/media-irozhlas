@@ -115,6 +115,7 @@ convert2teitok-brat:
 	  do echo "converting: $${FILE}" ; \
 	  perl convert/tei2teitok.pl --in "$(TEIANABRAT)/$${FILE}" \
 	                             --out "$(TEITOKBRAT)/$${FILE}" \
+	                             --ana-to-attribute-value "#single=aquality=x #double_unified=aquality=xx #triple_unified_curated=aquality=xxx" \
 	                             --stand-off-type "ATTRIBUTION" \
 	                             --stand-off-val-patch '^(.*(?:official|anonymous).*)$$/SOURCE:$$1' \
 	                             --stand-off-pref "attrib"; \

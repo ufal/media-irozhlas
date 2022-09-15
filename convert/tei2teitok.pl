@@ -15,6 +15,7 @@ GetOptions (
             'stand-off-type=s' => \$stand_off_type, # create standoff annotations in spanGrp with type
             'stand-off-pref=s' => \$stand_off_pref, # create standoff annotations from prefix
             'stand-off-val-patch=s' => \$stand_off_val_patch,
+            'stand-off-remove=s' => \$stand_off_remove,
             'split-corpus' => \$split_corpus,
         );
 
@@ -78,6 +79,7 @@ foreach $node ( $xml->findnodes("//w | //pc") ) {
 		undef $val;
 		if($make_standoff) {
 		  ($val) = $node->getAttribute('ana') =~ m/^.*\b(${stand_off_pref}:[^ "]+)/;
+		  String::Substitution::sub_modify($val,$stand_off_remove,'') if $val && $stand_off_remove;
 		  if($val){
 		  	my $span = $spanGrp->addNewChild('','span');
 		  	my $spanid = "$id.span";
@@ -104,7 +106,12 @@ foreach $node ( $xml->findnodes("//span") ) {
 		my $val = $node->getAttribute('ana');
 		$val =~ s/^.*\b${stand_off_pref}:([^ "]+).*?/$1/;
     String::Substitution::sub_modify($val,$stand_off_val_patch_from,$stand_off_val_patch_to) if $stand_off_val_patch;
+    String::Substitution::sub_modify($val,$stand_off_remove,'') if $stand_off_remove;
     $node->setAttribute("${stand_off_pref_abbr}type", $val) if $val;
+    unless($val){ # remove whole span if no annotation
+      print STDERR "removing span: $node\n";
+      $node->unbindNode;
+    }
 		$node->removeAttribute('ana');
 	}
 	if($node->hasAttribute('target')) {
@@ -142,6 +149,13 @@ foreach $node ( $xml->findnodes("//linkGrp[\@type=\"UD-SYN\"]/link") ) {
 };
 
 # Set ATTRIBUTION
+foreach $node ( $xml->findnodes("//linkGrp[\@type=\"$stand_off_type\"]/link") ) {
+	$val = $node->getAttribute('ana');
+	$val =~ s/^.*\b${stand_off_pref}:([^ "]+).*?/$1/;
+  String::Substitution::sub_modify($val,$stand_off_remove,'') if $stand_off_remove;
+	$node->unbindNode unless $val;
+};
+
 foreach $node ( $xml->findnodes("//linkGrp[\@type=\"$stand_off_type\"]/link") ) {
 	($t1, $t2) = split(" ", $linkGrp->getAttribute('targFunc'));
 	($a1, $a2) = split(" ", $node->getAttribute('target'));

@@ -118,6 +118,7 @@ convert2teitok-brat:
 	                             --ana-to-attribute-value "#single=aquality=x #double_unified=aquality=xx #triple_unified_curated=aquality=xxx" \
 	                             --stand-off-type "ATTRIBUTION" \
 	                             --stand-off-val-patch '^(.*(?:official|anonymous).*)$$/SOURCE:$$1' \
+	                             --stand-off-remove '^.*\d+$$' \
 	                             --stand-off-pref "attrib"; \
 	  done
 

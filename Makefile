@@ -58,6 +58,7 @@ udpipe: lib udpipe2
 	                             --model=czech-pdt-ud-2.6-200830 \
 	                             --elements "head,p,cell,li" \
 	                             --debug \
+	                             --use-xpos \
 	                             --try2continue-on-error \
 	                             --sub-elements "ref,hi" \
 	                             --filelist $(FL) \

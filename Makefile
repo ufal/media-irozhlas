@@ -5,6 +5,8 @@ TEI := ${OUT}/tei
 TEIANA := ${OUT}/tei-ana
 BRAT := ${OUT}/brat
 TEIANABRAT := ${OUT}/tei-ana-brat
+TEIANAQUOTE := ${OUT}/tei-ana-quote
+QUOTEINPUT := ${TEIANABRAT}
 UDPIPE := ${OUT}/udpipe
 NAMETAG := ${OUT}/nametag
 TEITOK := ${OUT}/teitok
@@ -123,6 +125,57 @@ convert2teitok-brat:
 	                             --stand-off-pref "attrib"; \
 	  done
 
+
+annotate-quote-prepare: # split quote.xml to multiple files
+	mkdir -p $(TEIANAQUOTE)-working
+	echo "reducing number of nodes"
+	cat CVUT-quotes/quotes.xml| sed 's/\s*<word xml:id="/#/;s/".*$$//'| tr -s ' '|tr "\n" " "\
+	  | sed 's/<\/quote>/<\/quote>\n/g' \
+	  | sed 's/<quote\([^#]*#\)\([^\.]*\)/<quote doc="\2"\1\2/' \
+	  | sed 's/> */>/g;s/ *</</g' \
+	  | sed 's/<teiQuotes>/\n<teiQuotes>\n/' > CVUT-quotes/quotes-compressed.xml
+annotate-quote-prepare2:
+	$(SAXON) net.sf.saxon.Transform -t -s:"CVUT-quotes/quotes-compressed.xml" -xsl:"convert/splitQuotes.xsl" outDir="$(TEIANAQUOTE)-working"
+
+
+annotate-quote: annotate-quote-prepare
+	mkdir -p $(TEIANAQUOTE)
+	echo "quote input $(QUOTEINPUT)"
+
+quote-count-overlapping-mwes:
+	cat CVUT-quotes/quotes-compressed.xml|sed -n '/#\(doc-[^ <]*\)[< ].*#\1[< ]/p' > CVUT-quotes/quotes-overlapping.xmllist
+	cat CVUT-quotes/quotes-overlapping.xmllist|wc -l ## 8309
+quote-pairs-overlapping-mwes:
+	@echo -n "firstName-surname\t"
+	@cat CVUT-quotes/quotes-overlapping.xmllist|sed -n '/<firstName>[^<>]*#\(doc-[^ <]*\)[< ].*surname>[^<>]*#\1[< ]/p' | wc -l
+	@echo -n "firstName-institution\t"
+	@cat CVUT-quotes/quotes-overlapping.xmllist|sed -n '/<firstName>[^<>]*#\(doc-[^ <]*\)[< ].*institution>[^<>]*#\1[< ]/p' | wc -l
+	@echo -n "firstName-role\t"
+	@cat CVUT-quotes/quotes-overlapping.xmllist|sed -n '/<firstName>[^<>]*#\(doc-[^ <]*\)[< ].*role>[^<>]*#\1[< ]/p' | wc -l
+	@echo -n "firstName-statement\t"
+	@cat CVUT-quotes/quotes-overlapping.xmllist|sed -n '/<firstName>[^<>]*#\(doc-[^ <]*\)[< ].*statement>[^<>]*#\1[< ]/p' | wc -l
+	@echo -n "surname-institution\t"
+	@cat CVUT-quotes/quotes-overlapping.xmllist|sed -n '/<surname>[^<>]*#\(doc-[^ <]*\)[< ].*institution>[^<>]*#\1[< ]/p' | wc -l
+	@echo -n "surname-role\t"
+	@cat CVUT-quotes/quotes-overlapping.xmllist|sed -n '/<surname>[^<>]*#\(doc-[^ <]*\)[< ].*role>[^<>]*#\1[< ]/p' | wc -l
+	@echo -n "surname-statement\t"
+	@cat CVUT-quotes/quotes-overlapping.xmllist|sed -n '/<surname>[^<>]*#\(doc-[^ <]*\)[< ].*statement>[^<>]*#\1[< ]/p' | wc -l
+	@echo -n "institution-role\t"
+	@cat CVUT-quotes/quotes-overlapping.xmllist|sed -n '/<institution>[^<>]*#\(doc-[^ <]*\)[< ].*role>[^<>]*#\1[< ]/p' | wc -l
+	@echo -n "institution-statement\t"
+	@cat CVUT-quotes/quotes-overlapping.xmllist|sed -n '/<institution>[^<>]*#\(doc-[^ <]*\)[< ].*statement>[^<>]*#\1[< ]/p' | wc -l
+	@echo -n "role-statement\t"
+	@cat CVUT-quotes/quotes-overlapping.xmllist|sed -n '/<role>[^<>]*#\(doc-[^ <]*\)[< ].*statement>[^<>]*#\1[< ]/p' | wc -l
+
+quote-count-missing:
+	echo "missing person = <firstName/><surname/>" ## 42133
+	cat CVUT-quotes/quotes-compressed.xml|grep -Fc '<firstName/><surname/>'
+	echo "missing  <institution/>" ## 166289
+	cat CVUT-quotes/quotes-compressed.xml|grep -Fc '<institution/>'
+	echo "missing  <role/>" ## 101211
+	cat CVUT-quotes/quotes-compressed.xml|grep -Fc '<role/>'
+	echo "missing  <statement/>" ## 0
+	cat CVUT-quotes/quotes-compressed.xml|grep -Fc '<statement/>'
 
 ################# DEVEL:
 

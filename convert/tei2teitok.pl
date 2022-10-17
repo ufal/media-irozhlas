@@ -39,21 +39,31 @@ eval {
 	$xml = $parser->load_xml(string => $raw, load_ext_dtd => 0);
 };
 
-my $spanGrp;
-my $linkGrp;
+my @stand_off_pref;
+my @stand_off_type;
+
+my @spanGrp;
+my @linkGrp;
 my %word_to_span_id;
-my $stand_off_pref_abbr;
+my @stand_off_pref_abbr;
 my ($stand_off_val_patch_from,$stand_off_val_patch_to);
 if($make_standoff){
 	die "make standoff is supported only on a single TEI file\n" if $xml->findnodes('/teiCorpus');
-	($spanGrp) = $xml->findnodes("//spanGrp[\@type=\"$stand_off_type\"]");
-	unless($spanGrp) {
-		$spanGrp = $xml->findnodes("/TEI/text")->[0]->addNewChild('','spanGrp');
-		$spanGrp->setAttribute("type",$stand_off_type);
-	}
-	($linkGrp) = $xml->findnodes("//linkGrp[\@type=\"$stand_off_type\"]");
-	print STDERR "LINKGRP:$linkGrp\n";
-  $stand_off_pref_abbr = substr($stand_off_pref,0,1);
+  @stand_off_pref = split(/,/, $stand_off_pref);
+  @stand_off_type = split(/,/, $stand_off_type);
+  @spanGrp = map {undef} @stand_off_type;
+  @linkGrp = map {undef} @stand_off_type;
+  @stand_off_pref_abbr = map {substr($_,0,1)} @stand_off_pref;
+  for my $i (0..$#stand_off_type){
+	  ($spanGrp[$i]) = $xml->findnodes("//spanGrp[\@type=\"$stand_off_type[$i]\"]");
+	  unless($spanGrp[$i]) {
+		  $spanGrp[$i] = $xml->findnodes("/TEI/text")->[0]->addNewChild('','spanGrp');
+		  $spanGrp[$i]->setAttribute("type",$stand_off_type[$i]);
+	  }
+	  ($linkGrp[$i]) = $xml->findnodes("//linkGrp[\@type=\"$stand_off_type[$i]\"]");
+	  print STDERR "SPANGRP:$spanGrp[$i]\n";
+	  print STDERR "LINKGRP:$linkGrp[$i]\n";
+  }
   ($stand_off_val_patch_from,$stand_off_val_patch_to) = split('/', $stand_off_val_patch//'');
   #$stand_off_val_patch_from = eval("qr/${stand_off_val_patch_from}/") if $stand_off_val_patch_from;
   ##$stand_off_val_patch_to = eval("${stand_off_val_patch_to}") if $stand_off_val_patch_to;
@@ -77,11 +87,12 @@ foreach $node ( $xml->findnodes("//w | //pc") ) {
 		$node->setAttribute('xpos', $val) if $val;
 
 		undef $val;
-		if($make_standoff) {
-		  ($val) = $node->getAttribute('ana') =~ m/^.*\b(${stand_off_pref}:[^ "]+)/;
+		for my $i (0..$#stand_off_pref){
+			my $p = $stand_off_pref[$i];
+		  ($val) = $node->getAttribute('ana') =~ m/^.*\b(${p}:[^ "]+)/;
 		  String::Substitution::sub_modify($val,$stand_off_remove,'') if $val && $stand_off_remove;
 		  if($val){
-		  	my $span = $spanGrp->addNewChild('','span');
+		  	my $span = $spanGrp[$i]->addNewChild('','span');
 		  	my $spanid = "$id.span";
 		  	$span->setAttribute("id",$spanid);
 		  	$word_to_span_id{$id} = $spanid;
@@ -99,30 +110,37 @@ foreach $node ( $xml->findnodes("//w | //pc") ) {
 	$node->setAttribute("type", $nodetype);
 };
 
-foreach $node ( $xml->findnodes("//span") ) {
-	$id = $node->getAttribute("id")."";
-	$id2node{$id} = $node;
-	if($node->hasAttribute('ana')) {
-		my $val = $node->getAttribute('ana');
-		$val =~ s/^.*\b${stand_off_pref}:([^ "]+).*?/$1/;
-    String::Substitution::sub_modify($val,$stand_off_val_patch_from,$stand_off_val_patch_to) if $stand_off_val_patch;
-    String::Substitution::sub_modify($val,$stand_off_remove,'') if $stand_off_remove;
-    $node->setAttribute("${stand_off_pref_abbr}type", $val) if $val;
-    unless($val){ # remove whole span if no annotation
-      print STDERR "removing span: $node\n";
-      $node->unbindNode;
-    }
-		$node->removeAttribute('ana');
-	}
-	if($node->hasAttribute('target')) {
-		my $val = $node->getAttribute('target');
-		$node->setAttribute('corresp', $val);
-		$node->removeAttribute('target');
-	}
 
-	# my ($first_tok_id) = $node->getAttribute('target') =~ m/^\s*#([^ ]*)/;
-	# $node->unbindNode();
-	# $id2node{$first_tok_id}->parentNode->insertBefore($node,$id2node{$first_tok_id});
+for my $i (0..$#stand_off_pref){
+	print STDERR "Processing: $stand_off_type[$i]/$stand_off_pref[$i]/$stand_off_pref_abbr[$i]\n";
+  foreach $node ( $spanGrp[$i]->findnodes(".//span") ) {
+		$id = $node->getAttribute("id")."";
+		$id2node{$id} = $node;
+		if($node->hasAttribute('ana')) {
+	  	my $val = $node->getAttribute('ana');
+	  	print STDERR "\t$val\n";
+		  my $p = $stand_off_pref[$i];
+		  my $a = $stand_off_pref_abbr[$i];
+		  $val =~ s/^.*\b${p}:([^ "]+).*?/$1/;
+	    String::Substitution::sub_modify($val,$stand_off_val_patch_from,$stand_off_val_patch_to) if $stand_off_val_patch;
+	    String::Substitution::sub_modify($val,$stand_off_remove,'') if $stand_off_remove;
+	    $node->setAttribute("${a}type", $val) if $val;
+	    unless($val){ # remove whole span if no annotation
+	      print STDERR "removing span: $node\n";
+	      $node->unbindNode;
+	    }
+	  	$node->removeAttribute('ana');
+		}
+		if($node->hasAttribute('target')) {
+			my $val = $node->getAttribute('target');
+			$node->setAttribute('corresp', $val);
+			$node->removeAttribute('target');
+		}
+
+		# my ($first_tok_id) = $node->getAttribute('target') =~ m/^\s*#([^ ]*)/;
+		# $node->unbindNode();
+		# $id2node{$first_tok_id}->parentNode->insertBefore($node,$id2node{$first_tok_id});
+	};
 };
 
 # Rename named entities attributes and remove CNEC prefixes
@@ -148,28 +166,35 @@ foreach $node ( $xml->findnodes("//linkGrp[\@type=\"UD-SYN\"]/link") ) {
 	};
 };
 
-# Set ATTRIBUTION
-foreach $node ( $xml->findnodes("//linkGrp[\@type=\"$stand_off_type\"]/link") ) {
-	$val = $node->getAttribute('ana');
-	$val =~ s/^.*\b${stand_off_pref}:([^ "]+).*?/$1/;
-  String::Substitution::sub_modify($val,$stand_off_remove,'') if $stand_off_remove;
-	$node->unbindNode unless $val;
-};
 
-foreach $node ( $xml->findnodes("//linkGrp[\@type=\"$stand_off_type\"]/link") ) {
-	($t1, $t2) = split(" ", $linkGrp->getAttribute('targFunc'));
-	($a1, $a2) = split(" ", $node->getAttribute('target'));
-	$base = substr($a2, 1);	$head = substr($a1, 1);
-	$base = $word_to_span_id{$base} // $base;
-	$head = $word_to_span_id{$head} // $head;
-	print STDERR "$base -> $head\n";
-	if ( $id2node{$base} && $id2node{$head} ) {
-		append_attribute($id2node{$base},"${stand_off_pref_abbr}$t1", $id2node{$head}->getAttribute("id"));
-		append_attribute($id2node{$head},"${stand_off_pref_abbr}$t2", $id2node{$base}->getAttribute("id"));
-
+for my $i (0..$#stand_off_pref){
+	# Set ATTRIBUTION / ...
+	foreach $node ( $xml->findnodes("//linkGrp[\@type=\"$stand_off_type[$i]\"]/link[\@ana]") ) {
+		$val = $node->getAttribute('ana');
+		my $p = $stand_off_pref[$i];
+		$val =~ s/^.*\b${p}:([^ "]+).*?/$1/;
+	  if($stand_off_remove){
+	  	String::Substitution::sub_modify($val,$stand_off_remove,'');
+		  $node->unbindNode unless $val;
+		}
 	};
-};
-$linkGrp->unbindNode if $linkGrp;
+
+	foreach $node ( $xml->findnodes("//linkGrp[\@type=\"$stand_off_type[$i]\"]/link") ) {
+		($t1, $t2) = split(" ", $linkGrp[$i]->getAttribute('targFunc'));
+		($a1, $a2) = split(" ", $node->getAttribute('target'));
+		$base = substr($a2, 1);	$head = substr($a1, 1);
+		$base = $word_to_span_id{$base} // $base;
+		$head = $word_to_span_id{$head} // $head;
+		print STDERR "$base -> $head\n";
+		if ( $id2node{$base} && $id2node{$head} ) {
+			my $a = $stand_off_pref_abbr[$i];
+	    append_attribute($id2node{$base},"$a$t1", $id2node{$head}->getAttribute("id"));
+			append_attribute($id2node{$head},"$a$t2", $id2node{$base}->getAttribute("id"));
+
+		};
+	};
+  $linkGrp[$i]->unbindNode if $linkGrp[$i];
+}
 
 # Copy head attributes to child
 for my $base ( keys %id2node ) {

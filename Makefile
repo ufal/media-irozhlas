@@ -6,11 +6,12 @@ TEIANA := ${OUT}/tei-ana
 BRAT := ${OUT}/brat
 TEIANABRAT := ${OUT}/tei-ana-brat
 TEIANAQUOTE := ${OUT}/tei-ana-quote
-QUOTEINPUT := ${TEIANABRAT}
+TEIANABRATQUOTE := ${OUT}/tei-ana-brat-quote
 UDPIPE := ${OUT}/udpipe
 NAMETAG := ${OUT}/nametag
 TEITOK := ${OUT}/teitok
 TEITOKBRAT := ${OUT}/teitok-brat
+TEITOKBRATQUOTE := ${OUT}/teitok-brat-quote
 TEITOKANNOTATIONS := ${OUT}/teitok-annotations
 
 CONLLU := ${OUT}/conllu
@@ -138,9 +139,47 @@ annotate-quote-prepare2:
 	$(SAXON) net.sf.saxon.Transform -t -s:"CVUT-quotes/quotes-compressed.xml" -xsl:"convert/splitQuotes.xsl" outDir="$(TEIANAQUOTE)-working"
 
 
-annotate-quote: annotate-quote-prepare
+annotate-quote:
 	mkdir -p $(TEIANAQUOTE)
-	echo "quote input $(QUOTEINPUT)"
+	echo "quote input $(TEIANA)"
+	for FILE in $(shell ls $(TEIANA) ) ; \
+	  do \
+	    $(SAXON) net.sf.saxon.Transform -t -s:"$(TEIANA)/$${FILE}" \
+	                                       -xsl:"convert/annotateQuotes.xsl" \
+	                                       -o:"$(TEIANAQUOTE)/$${FILE}" \
+	                                       outDir="$(TEIANAQUOTE)" \
+	                                       anaFile="../../$(TEIANAQUOTE)-working/quote-$${FILE}"; \
+	  done
+
+annotate-brat-quote:
+	mkdir -p $(TEIANABRATQUOTE)
+	echo "quote input $(TEIANABRAT) - double_unified + triple_unified_curated"
+	sleep 5
+	for FILE in $(shell cat $(FL)* ) ; \
+	  do \
+	    $(SAXON) net.sf.saxon.Transform -t -s:"$(TEIANABRAT)/$${FILE}" \
+	                                       -xsl:"convert/annotateQuotes.xsl" \
+	                                       -o:"$(TEIANABRATQUOTE)/$${FILE}" \
+	                                       outDir="$(TEIANABRATQUOTE)" \
+	                                       anaFile="../../$(TEIANAQUOTE)-working/quote-$${FILE}"; \
+	  done
+
+
+
+convert2teitok-brat-quote:
+	rm -rf $(TEITOKBRATQUOTE)
+	mkdir -p $(TEITOKBRATQUOTE)
+	for FILE in $(shell cat $(FL)* ) ; \
+	  do echo "converting: $${FILE}" ; \
+	  perl convert/tei2teitok.pl --in "$(TEIANABRATQUOTE)/$${FILE}" \
+	                             --out "$(TEITOKBRATQUOTE)/$${FILE}" \
+	                             --ana-to-attribute-value "#single=aquality=x #double_unified=aquality=xx #triple_unified_curated=aquality=xxx" \
+	                             --stand-off-type "ATTRIBUTION,QUOTATION" \
+	                             --stand-off-val-patch '^(.*(?:official|anonymous).*)$$/SOURCE:$$1' \
+	                             --stand-off-remove '^.*\d+$$' \
+	                             --stand-off-pref "attrib,quote"; \
+	  done
+
 
 quote-count-overlapping-mwes:
 	cat CVUT-quotes/quotes-compressed.xml|sed -n '/#\(doc-[^ <]*\)[< ].*#\1[< ]/p' > CVUT-quotes/quotes-overlapping.xmllist
@@ -180,13 +219,25 @@ quote-count-missing:
 ################# DEVEL:
 
 
-DEV-sync-sir-with-teitok:
+DEV-sync-sir-with-teitok-brat:
 	rm -f $(TEITOKANNOTATIONS)/*
 	mkdir -p $(TEITOKANNOTATIONS)
 	ls $(TEITOKBRAT) | xargs -I {} ln -s ../xmlfiles/{} $(TEITOKANNOTATIONS)/attrib_{}
 	rsync -avz --recursive $(TEITOKANNOTATIONS)/* parczech@parczech:/var/www/html/teitok/sir/Annotations/
 	rsync -avz  teitok-project/Annotations/attrib_def.xml parczech@parczech:/var/www/html/teitok/sir/Annotations/attrib_def.xml
 	rsync -avz --recursive $(TEITOKBRAT)/* parczech@parczech:/var/www/html/teitok/sir/xmlfiles/
+	rsync -avz --recursive teitok-project/Sources parczech@parczech:/var/www/html/teitok/sir/
+	rsync -avz --recursive teitok-project/Scripts parczech@parczech:/var/www/html/teitok/sir/
+
+DEV-sync-sir-with-teitok-brat-quote:
+	rm -f $(TEITOKANNOTATIONS)/*
+	mkdir -p $(TEITOKANNOTATIONS)
+	ls $(TEITOKBRATQUOTE) | xargs -I {} ln -s ../xmlfiles/{} $(TEITOKANNOTATIONS)/attrib_{}
+	ls $(TEITOKBRATQUOTE) | xargs -I {} ln -s ../xmlfiles/{} $(TEITOKANNOTATIONS)/quote_{}
+	rsync -avz --recursive $(TEITOKANNOTATIONS)/* parczech@parczech:/var/www/html/teitok/sir/Annotations/
+	rsync -avz  teitok-project/Annotations/attrib_def.xml parczech@parczech:/var/www/html/teitok/sir/Annotations/attrib_def.xml
+	rsync -avz  teitok-project/Annotations/quote_def.xml parczech@parczech:/var/www/html/teitok/sir/Annotations/quote_def.xml
+	rsync -avz --recursive $(TEITOKBRATQUOTE)/* parczech@parczech:/var/www/html/teitok/sir/xmlfiles/
 	rsync -avz --recursive teitok-project/Sources parczech@parczech:/var/www/html/teitok/sir/
 	rsync -avz --recursive teitok-project/Scripts parczech@parczech:/var/www/html/teitok/sir/
 

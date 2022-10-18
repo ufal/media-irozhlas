@@ -2,33 +2,17 @@
 
 	# mwe and link document view
 	# Matyáš Kopp, 2022
-	$viewname = $settings['xmlfile']['linkmwes']['title'] or $viewname = "MWEs and links View";
 
 	if ( !$_GET['cid'] ) $_GET['cid']  = $_GET['id'];
 
-	$linkmweslist = $settings['xmlfile']['linkmwes']['tags']
-		or 
-		$linkmweslist = array(
-			"phrase" => array ("display" => "phrase", "cqp" => "phrase", "value" => "PHRASE" ),
-			"SOURCE:anonymous" => array ("display" => "SOURCE:anonymous", "cqp" => "SOURCE:anonymous", "value" => "SOURCE:anonymous" ),
-			"SOURCE:anonymous-partial" => array ("display" => "SOURCE:anonymous-partial", "cqp" => "SOURCE:anonymous-partial", "value" => "SOURCE:anonymous-partial" ),
-			"SOURCE:official-non-political" => array ("display" => "SOURCE:official-non-political", "cqp" => "SOURCE:official-non-political", "value" => "SOURCE:official-non-political" ),
-			"SOURCE:official-political" => array ("display" => "SOURCE:official-political", "cqp" => "SOURCE:official-political", "value" => "SOURCE:official-political" ),
-			"SOURCE:unofficial" => array ("display" => "SOURCE:unofficial", "cqp" => "SOURCE:unofficial", "value" => "SOURCE:unofficial" ),
 
-			//"placename" => array ( "display" => "Place Name", "cqp" => "place", "node" => "place", "elm" => "placeName", "linkmwesid" => "ref" ),
-			//"persname" => array ( "display" => "Person Name", "cqp" => "person", "node" => "person", "elm" => "persName", "linkmwesid" => "ref" ),
-			//"orgname" => array ( "display" => "Organization Name", "cqp" => "org", "node" => "org", "elm" => "orgName", "linkmwesid" => "ref" ),
-			// "term" => array ( "display" => "Term", "cqp" => "term", "elm" => "term", "linkmwesid" => "ref" ),
-			// "name" => array ( "display" => "Name", "cqp" => "name", "elm" => "name", "linkmwesid" => "ref" ),
-			// "time" => array ( "display" => "Time", "cqp" => "time", "elm" => "time", "linkmwesid" => "none" ),
-			// "num" => array ( "display" => "Number", "cqp" => "num", "elm" => "num", "linkmwesid" => "none" ),
-			// "date" => array ( "display" => "Date", "cqp" => "date", "elm" => "date", "linkmwesid" => "none" ),
-			// "unit" => array ( "display" => "Unit", "cqp" => "unit", "elm" => "unit", "linkmwesid" => "none" ),
-			);
+	$annotation_type = $_GET['annotation_type'] or $annotation_type = 1;
+
+	$viewname = $settings['xmlfile']['linkmwes'][$annotation_type]['title'] or $viewname = "MWEs and links View";
+  $linkmweslist = $settings['xmlfile']['linkmwes'][$annotation_type]['tags'];
 	$typejson = array2json($linkmweslist);
-	$linkto = 'asignal';
-	$colorattr = 'atype';
+	$linkto = $settings['xmlfile']['linkmwes'][$annotation_type]['arrowhead'];
+	$colorattr = $settings['xmlfile']['linkmwes'][$annotation_type]['attribcolor'];
 
 /*
 	$nn2rn = array (
